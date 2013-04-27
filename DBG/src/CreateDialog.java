@@ -1,27 +1,23 @@
 import java.awt.BorderLayout;
-import java.util.Vector;
-
 import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class CreateDialog extends SQLDialog{
 
+	private QueryPanel main;
+	
 	public CreateDialog() {
 		super();
-		
-		QueryPanel main = new QueryPanel(names, types);
-		
-		JPanel topPanel = new JPanel();		
-		tables = new JComboBox<String>(new Vector<String>(Core.core.tables));
-		
+
+		JPanel topPanel = new JPanel();
 		topPanel.add(new JLabel("Create new entry in"));
 		topPanel.add(tables);
 		topPanel.setBorder(BorderFactory.createEtchedBorder());
 		
+		updateQueryPanels();
+		
 		this.add(topPanel, BorderLayout.NORTH);
-		this.add(main, BorderLayout.CENTER);
 		this.finalize();
 	}
 	
@@ -30,6 +26,17 @@ public class CreateDialog extends SQLDialog{
 		// and do something with them
 		
 		super.close();
+	}
+
+	public void updateQueryPanels(){
+		updateAttribData();
+		
+		if(this.isAncestorOf(main)){
+			this.remove(main);
+		}
+		main = new QueryPanel(attribNames, attribTypes);
+		this.add(main, BorderLayout.CENTER);
+		this.finalize();
 	}
 
 }

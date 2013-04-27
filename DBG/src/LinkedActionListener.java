@@ -1,16 +1,26 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class LinkedActionListener implements ActionListener{
 
-	private SQLDialog parent;
+	public static final int BUTTON = 1;
+	public static final int COMBOBOX = 2;
 	
-	public LinkedActionListener(SQLDialog p){
+	private SQLDialog parent;
+	private int type;
+	
+	public LinkedActionListener(SQLDialog p, int t){
 		parent = p;
+		type = t;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		parent.close();
+		if(type == BUTTON){
+			parent.close();
+		}else if(type == COMBOBOX){
+			parent.updateQueryPanels();
+		}
 	}
 
 }

@@ -1,38 +1,32 @@
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.util.Vector;
-
 import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
 public class UpdateDialog extends SQLDialog{
+	
+	private QueryPanel conditions, values;
+	private JPanel main, topPanel, lowerPanel;
 
 	public UpdateDialog() {
 		super();
 		
-		QueryPanel conditions = new QueryPanel(names, types);
-		QueryPanel values = new QueryPanel(names, types);
-		
-		JPanel main = new JPanel(new GridLayout(2, 1));
-		JPanel topPanel = new JPanel();
-		JPanel lowerPanel = new JPanel(new BorderLayout());
-		
-		tables = new JComboBox<String>(new Vector<String>(Core.core.tables));
+		main = new JPanel(new GridLayout(2, 1));
+		topPanel = new JPanel();
+		lowerPanel = new JPanel(new BorderLayout());
 		
 		topPanel.add(new JLabel("Update entries in"));
 		topPanel.add(tables);
 		topPanel.add(new JLabel("where"));
 		topPanel.setBorder(BorderFactory.createEtchedBorder());
 		
-		lowerPanel.add(new JLabel("Update to"), BorderLayout.NORTH);
-		lowerPanel.add(values, BorderLayout.CENTER);
 		lowerPanel.setBorder(BorderFactory.createEtchedBorder());
+		lowerPanel.add(new JLabel("Update to:"), BorderLayout.NORTH);
+		main.add(lowerPanel, 1, 0);
 		
-		main.add(conditions);
-		main.add(lowerPanel);
+		updateQueryPanels();
 		
 		this.add(topPanel, BorderLayout.NORTH);
 		this.add(main, BorderLayout.CENTER);
@@ -44,6 +38,25 @@ public class UpdateDialog extends SQLDialog{
 		// and do something with them
 		
 		super.close();
+	}
+
+	public void updateQueryPanels() {
+		updateAttribData();
+		
+		if(lowerPanel.isAncestorOf(values)){
+			lowerPanel.remove(values);
+		}
+		if(main.isAncestorOf(conditions)){
+			main.remove(conditions);
+		}
+		
+		values = new QueryPanel(attribNames, attribTypes);
+		conditions = new QueryPanel(attribNames, attribTypes);
+		
+		lowerPanel.add(values, BorderLayout.CENTER);
+		main.add(conditions, 0, 0);
+		this.finalize();
+		
 	}
 	
 }

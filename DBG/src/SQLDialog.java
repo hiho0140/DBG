@@ -1,6 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -10,18 +10,22 @@ public abstract class SQLDialog extends JFrame{
 	
 	protected JComboBox<String> tables;
 	protected ArrayList<String> tableNames;
-	protected ArrayList<String> names;
-	protected ArrayList<String> types;
+	protected ArrayList<String> attribNames;
+	protected ArrayList<String> attribTypes;
 	private JButton goButton;
 	
 	public SQLDialog(){
-		tableNames = Core.core.getTableNames();
+		try {
+			tableNames = Core.core.getTableNames();
+		} catch (SQLException e) {
+			tableNames = new ArrayList<String>();
+		}
 		tables = new JComboBox<String>(new Vector<String>(tableNames));
-		names = Core.core.getAttributeNames(tableNames.get(0));
-		types = Core.core.getDataTypes(tableNames.get(0));
+		LinkedActionListener comboListener = new LinkedActionListener(this, LinkedActionListener.COMBOBOX);
+		tables.addActionListener(comboListener);
 		
 		goButton = new JButton("Go");
-		LinkedActionListener goListener = new LinkedActionListener(this);
+		LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.BUTTON);
 		goButton.addActionListener(goListener);
 		goButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		
@@ -30,9 +34,17 @@ public abstract class SQLDialog extends JFrame{
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
-	public void setActionListener(ActionListener al){
-		goButton.addActionListener(al);
+	public void updateAttribData(){
+		try {
+			attribNames = Core.core.getAttributeNames(tableNames.get(tables.getSelectedIndex()));
+			attribTypes = Core.core.getDataTypes(tableNames.get(tables.getSelectedIndex()));
+		} catch (SQLException e) {
+			attribNames = new ArrayList<String>();
+			attribTypes = new ArrayList<String>();
+		}
 	}
+	
+	public abstract void updateQueryPanels();
 	
 	public void finalize(){
 		this.pack();

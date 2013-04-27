@@ -4,6 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -11,7 +16,7 @@ import javax.swing.table.DefaultTableModel;
 public class Core {
 
 	public static Core core;
-
+	private Connection con;
 	
 	public ArrayList<String> tables, attributes, types;
 	private Object[][] testdata = {{"herp","herp","herp","herp","herp"},{"derp","derp","derp","derp","derp"},{"wat","wat","wat","wat","wat"}};
@@ -26,22 +31,13 @@ public class Core {
 	public Core(){
 		
 		//Connect to the database
-		/*
-	    Connection con;
+		
 		try {
 			Class.forName("org.postgresql.Driver");
 			con = DriverManager.getConnection(
 			        "jdbc:postgresql://reddwarf.cs.rit.edu/p48501m",
 			        "p48501m",
-			        "Oakfr0125");
-				Statement stmt = con.createStatement();
-				ResultSet rs = stmt.executeQuery("SELECT a, b, c FROM Table1");
-				
-				while (rs.next()) {
-				int x = rs.getInt("a");
-				String s = rs.getString("b");
-				float f = rs.getFloat("c");
-				}
+			        "herpderp");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,7 +45,7 @@ public class Core {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		*/
+		
 		
 		//Initialize Shtuff
 				tables = new ArrayList<String>();
@@ -222,17 +218,29 @@ public class Core {
 		dia.close();
 	}
 	
-	public ArrayList<String> getTableNames(){
+	public ArrayList<String> getTableNames() throws SQLException{
 		//This needs to query the database for all table names
 		//and return a suitable arraylist of them.
+		ResultSet rs = runQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';");
+		tables.clear();
+		
+		while(rs.next()){
+			tables.add(rs.getString(1));
+		}
+		
 		return tables;
 	}
 	
-	public ArrayList<String> getAttributeNames(String name){
+	public ArrayList<String> getAttributeNames(String name) throws SQLException{
 		//This needs to query the database for all attribute
 		//names in the specified table and return a
 		//suitable arraylist of them.
+		ResultSet rs = runQuery("SELECT column_name FROM information_schema.columns WHERE table_name = '" + name + "'");
+		attributes.clear();
 		
+		while(rs.next()){
+			attributes.add(rs.getString(1));
+		}
 		
 		return attributes;
 	}
@@ -242,6 +250,12 @@ public class Core {
 		//datatypes in the specified table and return a
 		//suitable arraylist of them.
 		return types;
+	}
+	
+	public ResultSet runQuery(String q) throws SQLException{
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(q);
+		return rs;
 	}
 	
 	public void quitProgram(){
