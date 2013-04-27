@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;

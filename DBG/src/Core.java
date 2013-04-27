@@ -232,6 +232,8 @@ public class Core {
 		//This needs to query the database for all attribute
 		//names in the specified table and return a
 		//suitable arraylist of them.
+		
+		
 		return attributes;
 	}
 	
