@@ -7,9 +7,13 @@ import java.awt.event.WindowListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Vector;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -17,16 +21,28 @@ public class Core {
 
 	public static Core core;
 	private Connection con;
+	private ResultSet curResults;
 	
-	public ArrayList<String> tables, attributes, types;
+	public ArrayList<String> tables, attributes;
+	public ArrayList<Integer> types;
 	private Object[][] testdata = {{"herp","herp","herp","herp","herp"},{"derp","derp","derp","derp","derp"},{"wat","wat","wat","wat","wat"}};
 	
+	private NameManager nameMan = new NameManager();
+	
 	//GUI components
-	public JButton newEntry, newTable, editEntry, editTable, delEntry, delTable, retEntry, retTable;
-	public JTable table;
+	private JButton newEntry, editEntry, delEntry, retEntry;
+	private JTable table;
+	private DefaultTableModel model;
 	public JFrame window;
 	
 	private ArrayList<SQLDialog> dialogs = new ArrayList<SQLDialog>();
+	
+	public static void main(String[] args){
+		
+		core = new Core();
+		core.initGUI();
+
+	}
 	
 	public Core(){
 		
@@ -54,37 +70,18 @@ public class Core {
 				
 		//set up a dummy array of attribute names
 				attributes = new ArrayList<String>();
-				types = new ArrayList<String>();
+				types = new ArrayList<Integer>();
 				attributes.add("attr1");
 				attributes.add("attr2");
 				attributes.add("attr3");
 				attributes.add("attr4");
 				attributes.add("attr5");
-				types.add("type1");
-				types.add("type2");
-				types.add("type3");
-				types.add("type4");
-				types.add("type5");
+				types.add(1);
+				types.add(2);
+				types.add(3);
+				types.add(4);
+				types.add(5);
 
-	}
-	
-	public static void main(String[] args){
-		
-		core = new Core();
-		core.initGUI();
-		
-		/*
-		ArrayList<String> herp = new ArrayList<String>();
-		herp.add(new String("herp"));
-		herp.add(new String("herp"));
-		ArrayList<String> derp = new ArrayList<String>();
-		derp.add(new String("derp"));
-		derp.add(new String("derp"));
-		CreateDialog test1 = new CreateDialog(herp, derp);
-		DeleteDialog test2 = new DeleteDialog(herp, derp);
-		UpdateDialog test3 = new UpdateDialog(herp, derp);
-		RetrieveDialog test4 = new RetrieveDialog(herp, derp);
-		*/
 	}
 	
 	private void initGUI(){
@@ -116,8 +113,19 @@ public class Core {
 		//=========================//
 		
 		//Put the table in a scrollpane so the column headers show up properly
-		table = new JTable(new DefaultTableModel(testdata, attributes.toArray()));
+		model = new DefaultTableModel(testdata, attributes.toArray());
+		table = new JTable(model);
 		JScrollPane scroller = new JScrollPane(table);
+		
+		
+		//========================//
+		//====== SIDE PANEL ======//
+		//========================//
+		
+		JPanel left = new JPanel();
+		left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+		
+		
 		
 		
 		//========================//
@@ -219,9 +227,7 @@ public class Core {
 	}
 	
 	public ArrayList<String> getTableNames() throws SQLException{
-		//This needs to query the database for all table names
-		//and return a suitable arraylist of them.
-		ResultSet rs = runQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';");
+		ResultSet rs = runQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' and table_type != 'view';");
 		tables.clear();
 		
 		while(rs.next()){
@@ -232,9 +238,6 @@ public class Core {
 	}
 	
 	public ArrayList<String> getAttributeNames(String name) throws SQLException{
-		//This needs to query the database for all attribute
-		//names in the specified table and return a
-		//suitable arraylist of them.
 		ResultSet rs = runQuery("SELECT column_name FROM information_schema.columns WHERE table_name = '" + name + "'");
 		attributes.clear();
 		
@@ -245,17 +248,70 @@ public class Core {
 		return attributes;
 	}
 	
-	public ArrayList<String> getDataTypes(String name){
+	public ArrayList<Integer> getDataTypes(String name) throws SQLException{
 		//This needs to query the database for all attribute
 		//datatypes in the specified table and return a
 		//suitable arraylist of them.
+		
+		ResultSet rs = runQuery("SELECT * from " + name + ";");
+		ResultSetMetaData rsmd = rs.getMetaData();
+		types.clear();
+		
+		for(int i = 1; i <= rsmd.getColumnCount(); i++){
+			types.add(new Integer(rsmd.getColumnType(i)));
+		}
+		
 		return types;
 	}
 	
-	public ResultSet runQuery(String q) throws SQLException{
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(q);
-		return rs;
+	public synchronized ResultSet runQuery(String q){
+		Statement stmt;
+		try {
+			stmt = con.createStatement();
+			curResults = stmt.executeQuery(q);
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage());
+		}
+		return curResults;
+	}
+	
+	public void setValueAt(Object aValue, int row, int column) throws SQLException{
+		if(curResults != null){
+			
+			curResults.first();
+			for(int i = row - 1; i > 0; i--){
+				curResults.next();
+			}
+			
+			switch(curResults.getMetaData().getColumnType(column)){
+				case Types.INTEGER:
+					curResults.updateInt(column, ((Integer)aValue).intValue());
+					break;
+				case Types.DOUBLE:
+					curResults.updateDouble(column, ((Double)aValue).doubleValue());
+					break;
+				case Types.VARCHAR:
+					curResults.updateString(column, (String)aValue);
+					break;
+				case Types.BOOLEAN:
+					curResults.updateBoolean(column, ((Boolean)aValue).booleanValue());
+					break;
+				default:
+					break;
+			}
+			
+			curResults.updateRow();
+			
+		}
+	}
+	
+	public void updateTable(Vector<String> colNames, Vector<Vector<String>> data){
+		model.setDataVector(data, colNames);
+		table.repaint();
+	}
+	
+	public String getNiceName(String tableName, String attributeName){
+		return nameMan.getNameFor(tableName, attributeName);
 	}
 	
 	public void quitProgram(){

@@ -4,8 +4,7 @@ import java.sql.SQLException;
 
 public class LinkedActionListener implements ActionListener{
 
-	public static final int BUTTON = 1;
-	public static final int COMBOBOX = 2;
+	public static final int BUTTON = 1, COMBOBOX = 2;
 	
 	private SQLDialog parent;
 	private int type;

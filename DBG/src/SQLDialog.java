@@ -10,41 +10,70 @@ public abstract class SQLDialog extends JFrame{
 	
 	protected JComboBox<String> tables;
 	protected ArrayList<String> tableNames;
+	protected ArrayList<String> niceNames;
 	protected ArrayList<String> attribNames;
-	protected ArrayList<String> attribTypes;
+	protected ArrayList<Integer> attribTypes;
+	protected String curTable;
 	private JButton goButton;
 	
+	protected int mode;
+	public static final int GENERALIZED = 1, SPECIALIZED = 2;
+	
 	public SQLDialog(){
-		try {
-			tableNames = Core.core.getTableNames();
-		} catch (SQLException e) {
-			tableNames = new ArrayList<String>();
-		}
-		tables = new JComboBox<String>(new Vector<String>(tableNames));
-		LinkedActionListener comboListener = new LinkedActionListener(this, LinkedActionListener.COMBOBOX);
-		tables.addActionListener(comboListener);
+			mode = SQLDialog.GENERALIZED;
 		
-		goButton = new JButton("Go");
-		LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.BUTTON);
-		goButton.addActionListener(goListener);
-		goButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		
-		this.setLayout(new BorderLayout());
-		this.add(goButton, BorderLayout.SOUTH);
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			try {
+				tableNames = Core.core.getTableNames();
+			} catch (SQLException e) {
+				tableNames = new ArrayList<String>();
+			}
+			
+			tables = new JComboBox<String>(new Vector<String>(tableNames));
+			LinkedActionListener comboListener = new LinkedActionListener(this, LinkedActionListener.COMBOBOX);
+			tables.addActionListener(comboListener);
+			curTable = tableNames.get(tables.getSelectedIndex());
+			
+			goButton = new JButton("Go");
+			LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.BUTTON);
+			goButton.addActionListener(goListener);
+			goButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+			
+			this.setLayout(new BorderLayout());
+			this.add(goButton, BorderLayout.SOUTH);
+			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	}
+	
+	public SQLDialog(ArrayList<String> n, ArrayList<String> nn, String tn){
+			mode = SQLDialog.SPECIALIZED;
+			
+			curTable = tn;
+			attribNames = n;
+			niceNames = nn;
+			
+			goButton = new JButton("Go");
+			LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.BUTTON);
+			goButton.addActionListener(goListener);
+			goButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+			
+			this.setLayout(new BorderLayout());
+			this.add(goButton, BorderLayout.SOUTH);
+			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
 	}
 	
 	public void updateAttribData(){
 		try {
-			attribNames = Core.core.getAttributeNames(tableNames.get(tables.getSelectedIndex()));
-			attribTypes = Core.core.getDataTypes(tableNames.get(tables.getSelectedIndex()));
+			attribNames = Core.core.getAttributeNames(curTable);
+			attribTypes = Core.core.getDataTypes(curTable);
 		} catch (SQLException e) {
 			attribNames = new ArrayList<String>();
-			attribTypes = new ArrayList<String>();
+			attribTypes = new ArrayList<Integer>();
 		}
 	}
 	
-	public abstract void updateQueryPanels();
+	public void updateQueryPanels(){
+		curTable = tableNames.get(tables.getSelectedIndex());
+		updateAttribData();
+	}
 	
 	public void finalize(){
 		this.pack();

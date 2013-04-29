@@ -18,27 +18,33 @@ import javax.swing.JTextField;
 public class QueryPanel extends JPanel{
 	
 	private ArrayList<JTextField> fields;
-	private ArrayList<String> names;
-	private ArrayList<String> types;
+	private ArrayList<String> attributes;
+	private ArrayList<Integer> types;
+	private String tableName;
 
-	public QueryPanel(ArrayList<String> n, ArrayList<String> t) {
+	public QueryPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn) {
 		fields = new ArrayList<JTextField>();
-		names = new ArrayList<String>(n);
-		types = new ArrayList<String>(t);
+		attributes = new ArrayList<String>(nl);
+		types = new ArrayList<Integer>(tl);
+		tableName = new String(tn);
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		for(int i = 0; i < names.size(); i++){
+		for(int i = 0; i < attributes.size(); i++){
 			// Each field needs proper formatting based on the associated type
 			// Toss in an if/switch block later for this
 			fields.add(new JTextField(20));
 			
 			JPanel fieldPanel = new JPanel();
-			fieldPanel.add(new JLabel(names.get(i), JLabel.RIGHT));
+			fieldPanel.add(new JLabel(Core.core.getNiceName(tableName, attributes.get(i)), JLabel.RIGHT));
 			fieldPanel.add(fields.get(i));
 			
 			this.add(fieldPanel);
 		}
+	}
+	
+	public ArrayList<String> getNames(){
+		return attributes;
 	}
 	
 	public ArrayList<String> getValues(){
