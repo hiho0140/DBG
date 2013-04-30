@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 public class QueryPanel extends JPanel{
 	
 	private ArrayList<JTextField> fields;
-	private ArrayList<JComboBox<String>> operators;
+	private ArrayList<JComboBox> operators;
 	private ArrayList<String> attributes;
 	private ArrayList<Integer> types;
 	private String tableName;
@@ -32,7 +32,7 @@ public class QueryPanel extends JPanel{
 	//Query Mode Constructor
 	public QueryPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn) {
 		fields = new ArrayList<JTextField>();
-		operators = new ArrayList<JComboBox<String>>();
+		operators = new ArrayList<JComboBox>();
 		attributes = new ArrayList<String>(nl);
 		types = new ArrayList<Integer>(tl);
 		tableName = new String(tn);
@@ -46,19 +46,19 @@ public class QueryPanel extends JPanel{
 			
 			switch(types.get(i).intValue()){
 				case Types.BIT:
-					operators.add(new JComboBox<String>(boolOps));
+					operators.add(new JComboBox(boolOps));
 					break;
 				case Types.BOOLEAN:
-					operators.add(new JComboBox<String>(boolOps));
+					operators.add(new JComboBox(boolOps));
 					break;
 				case Types.INTEGER:
-					operators.add(new JComboBox<String>(numberOps));
+					operators.add(new JComboBox(numberOps));
 					break;
 				case Types.DOUBLE:
-					operators.add(new JComboBox<String>(numberOps));
+					operators.add(new JComboBox(numberOps));
 					break;
 				case Types.VARCHAR:
-					operators.add(new JComboBox<String>(stringOps));
+					operators.add(new JComboBox(stringOps));
 					break;
 				default:
 					break;
@@ -79,8 +79,8 @@ public class QueryPanel extends JPanel{
 	
 	public ArrayList<String> getOperators(){
 		ArrayList<String> ops = new ArrayList<String>();
-		for(JComboBox<String> cb : operators){
-			ops.add(new String(cb.getItemAt(cb.getSelectedIndex())));
+		for(JComboBox cb : operators){
+			ops.add(new String((String) cb.getItemAt(cb.getSelectedIndex())));
 		}
 		return ops;
 	}

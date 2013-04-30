@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public abstract class SQLDialog extends JFrame{
 	
-	protected JComboBox<String> tables;
+	protected JComboBox tables;
 	protected ArrayList<String> tableNames;
 	protected ArrayList<String> niceNames;
 	protected ArrayList<String> attribNames;
@@ -26,7 +26,7 @@ public abstract class SQLDialog extends JFrame{
 				tableNames = new ArrayList<String>();
 			}
 			
-			tables = new JComboBox<String>(new Vector<String>(tableNames));
+			tables = new JComboBox(new Vector<String>(tableNames));
 			LinkedActionListener comboListener = new LinkedActionListener(this, LinkedActionListener.COMBOBOX);
 			tables.addActionListener(comboListener);
 			curTable = tableNames.get(tables.getSelectedIndex());

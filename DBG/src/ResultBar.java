@@ -9,10 +9,10 @@ public class ResultBar extends JPanel{
 	//ResultBar will take the results of a query performed via the Sidebar
 	//and display them in some fashion for the user to select
 
-	protected final JList<String> theList;
+	protected final JList theList;
 
 	public ResultBar(){
-		theList = new JList<String>();
+		theList = new JList();
 		theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		theList.addListSelectionListener(new ListSelectionListener(){
 			public void valueChanged(ListSelectionEvent arg0) {
