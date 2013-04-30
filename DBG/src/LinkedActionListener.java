@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 public class LinkedActionListener implements ActionListener{
 
-	public static final int BUTTON = 1, COMBOBOX = 2;
+	public static final int CLOSEBUTTON = 1, COMBOBOX = 2, APPLYBUTTON = 3, REVERTBUTTON = 4;
 	
 	private SQLDialog parent;
 	private int type;
@@ -15,7 +15,7 @@ public class LinkedActionListener implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		if(type == BUTTON){
+		if(type == CLOSEBUTTON){
 			parent.close();
 		}else if(type == COMBOBOX){
 			parent.updateQueryPanels();

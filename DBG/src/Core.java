@@ -36,7 +36,6 @@ public class Core {
 	private DefaultTableModel model;
 	private QuickPanel quickPanel;
 	private Sidebar quickBar;
-	private ResultBar resultBar;
 	public JFrame window;
 	
 	private ArrayList<SQLDialog> dialogs = new ArrayList<SQLDialog>();
@@ -69,23 +68,8 @@ public class Core {
 		
 		//Initialize Shtuff
 				tables = new ArrayList<String>();
-				tables.add("Table 1");
-				tables.add("Table 2");
-				
-		//set up a dummy array of attribute names
 				attribNames = new ArrayList<String>();
 				attribTypes = new ArrayList<Integer>();
-				attribNames.add("attr1");
-				attribNames.add("attr2");
-				attribNames.add("attr3");
-				attribNames.add("attr4");
-				attribNames.add("attr5");
-				attribTypes.add(1);
-				attribTypes.add(2);
-				attribTypes.add(3);
-				attribTypes.add(4);
-				attribTypes.add(5);
-
 	}
 	
 	private void initGUI(){
@@ -128,8 +112,9 @@ public class Core {
 		
 		quickBar = new Sidebar();
 		window.add(quickBar, BorderLayout.WEST);
-		resultBar = new ResultBar();
-		window.add(resultBar, BorderLayout.EAST);
+		quickPanel = new QuickPanel();
+		window.add(quickPanel, BorderLayout.CENTER);
+		
 		
 		//========================//
 		//===== CRUD BUTTONS =====//
@@ -368,21 +353,19 @@ public class Core {
 	}
 	
 	public void populateFields(ArrayList<String> colNames, ArrayList<String> data){
-		quickPanel = new QuickPanel(colNames, data);
+		quickPanel.updateFields(colNames, data);
 		switchToQuickPanel();
 		quickPanel.repaint();
 	}
 
 	public void switchToTable(){
 		quickPanel.setVisible(false);
-		resultBar.setEnabled(false);
 		scroller.setVisible(true);
 	}
 	
 	public void switchToQuickPanel(){
 		scroller.setVisible(false);
 		quickPanel.setVisible(true);
-		resultBar.setEnabled(true);
 	}
 	
 	public String getNiceName(String tableName, String attributeName){

@@ -32,7 +32,7 @@ public abstract class SQLDialog extends JFrame{
 			curTable = tableNames.get(tables.getSelectedIndex());
 			
 			goButton = new JButton("Go");
-			LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.BUTTON);
+			LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.CLOSEBUTTON);
 			goButton.addActionListener(goListener);
 			goButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
 			
@@ -47,7 +47,7 @@ public abstract class SQLDialog extends JFrame{
 			niceNames = nn;
 			
 			goButton = new JButton("Go");
-			LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.BUTTON);
+			LinkedActionListener goListener = new LinkedActionListener(this, LinkedActionListener.CLOSEBUTTON);
 			goButton.addActionListener(goListener);
 			goButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
 			

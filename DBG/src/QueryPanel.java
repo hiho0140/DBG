@@ -1,3 +1,6 @@
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.sql.Types;
 import java.util.ArrayList;
 
@@ -64,10 +67,14 @@ public class QueryPanel extends JPanel{
 					break;
 			}
 			
-			JPanel fieldPanel = new JPanel();
-			fieldPanel.add(new JLabel(Core.core.getNiceName(tableName, attributes.get(i)), JLabel.RIGHT));
-			fieldPanel.add(operators.get(i));
-			fieldPanel.add(fields.get(i));
+			JPanel fieldPanel = new JPanel(new BorderLayout()), topPanel = new JPanel(), midPanel = new JPanel();
+			topPanel.setLayout(new GridLayout(1, 1));
+			topPanel.add(new JLabel(Core.core.getNiceName(tableName, attributes.get(i)), JLabel.LEFT));
+			midPanel.add(operators.get(i));
+			midPanel.add(fields.get(i));
+			
+			fieldPanel.add(topPanel, BorderLayout.NORTH);
+			fieldPanel.add(midPanel, BorderLayout.CENTER);
 			
 			this.add(fieldPanel);
 		}

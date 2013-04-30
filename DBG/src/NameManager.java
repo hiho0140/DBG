@@ -46,12 +46,12 @@ public class NameManager {
 		curMap.put("apm", "Assists/Minute");
 		curMap.put("d", "Deaths");
 		curMap.put("dpm", "Deaths/Minute");
-		curMap.put("cpc", "");
-		curMap.put("cpb", "");
+		curMap.put("cpc", "Cap. Points Captured");
+		curMap.put("cpb", "Captures Stopped");
 		curMap.put("dom", "Dominations");
-		curMap.put("rev", "");
-		curMap.put("uc", "");
-		curMap.put("ucd", "");
+		curMap.put("rev", "Revenges");
+		curMap.put("uc", "Ubercharges");
+		curMap.put("ucd", "Ubercharge Drops");
 		
 		curMap = names.get(TEAM_STAT);
 		curMap.put("team_id", "Team ID");
@@ -72,19 +72,19 @@ public class NameManager {
 		curMap.put("points", "Points");
 		curMap.put("ppm", "Points/Minute");
 		curMap.put("dmg", "Damage");
-		curMap.put("ddm", "");
+		curMap.put("ddm", "Damage/Minute");
 		curMap.put("f", "Frags");
 		curMap.put("fpm", "Frags/Minute");
 		curMap.put("a", "Assists");
 		curMap.put("apm", "Assists/Minute");
 		curMap.put("d", "Deaths");
 		curMap.put("dpm", "Deaths/Minute");
-		curMap.put("cpc", "");
-		curMap.put("cpb", "");
+		curMap.put("cpc", "Capture Points");
+		curMap.put("cpb", "Captures Stopped");
 		curMap.put("dom", "Dominations");
-		curMap.put("rev", "");
-		curMap.put("uc", "");
-		curMap.put("ucd", "");
+		curMap.put("rev", "Revenges");
+		curMap.put("uc", "Ubercharges");
+		curMap.put("ucd", "Ubercharge Drops");
 		curMap.put("match_id", "Match ID");
 		curMap.put("team_id", "Team ID");
 		
