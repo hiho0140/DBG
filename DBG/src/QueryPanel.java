@@ -1,6 +1,8 @@
+import java.sql.Types;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -18,12 +20,18 @@ import javax.swing.JTextField;
 public class QueryPanel extends JPanel{
 	
 	private ArrayList<JTextField> fields;
+	private ArrayList<JComboBox<String>> operators;
 	private ArrayList<String> attributes;
 	private ArrayList<Integer> types;
 	private String tableName;
+	
+	String[] boolOps = { "=", "!=" };
+	String[] numberOps = { "=", "!=", "<", "<=", ">", ">=", "IN" };
+	String[] stringOps = { "=", "!=", "LIKE", "NOT LIKE", "IN" };
 
 	public QueryPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn) {
 		fields = new ArrayList<JTextField>();
+		operators = new ArrayList<JComboBox<String>>();
 		attributes = new ArrayList<String>(nl);
 		types = new ArrayList<Integer>(tl);
 		tableName = new String(tn);
@@ -35,8 +43,29 @@ public class QueryPanel extends JPanel{
 			// Toss in an if/switch block later for this
 			fields.add(new JTextField(20));
 			
+			switch(types.get(i).intValue()){
+				case Types.BIT:
+					operators.add(new JComboBox<String>(boolOps));
+					break;
+				case Types.BOOLEAN:
+					operators.add(new JComboBox<String>(boolOps));
+					break;
+				case Types.INTEGER:
+					operators.add(new JComboBox<String>(numberOps));
+					break;
+				case Types.DOUBLE:
+					operators.add(new JComboBox<String>(numberOps));
+					break;
+				case Types.VARCHAR:
+					operators.add(new JComboBox<String>(stringOps));
+					break;
+				default:
+					break;
+			}
+			
 			JPanel fieldPanel = new JPanel();
 			fieldPanel.add(new JLabel(Core.core.getNiceName(tableName, attributes.get(i)), JLabel.RIGHT));
+			fieldPanel.add(operators.get(i));
 			fieldPanel.add(fields.get(i));
 			
 			this.add(fieldPanel);
@@ -45,6 +74,14 @@ public class QueryPanel extends JPanel{
 	
 	public ArrayList<String> getNames(){
 		return attributes;
+	}
+	
+	public ArrayList<String> getOperators(){
+		ArrayList<String> ops = new ArrayList<String>();
+		for(JComboBox<String> cb : operators){
+			ops.add(new String(cb.getItemAt(cb.getSelectedIndex())));
+		}
+		return ops;
 	}
 	
 	public ArrayList<String> getValues(){

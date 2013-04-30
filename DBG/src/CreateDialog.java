@@ -54,4 +54,16 @@ public class CreateDialog extends SQLDialog{
 		this.finalize();
 	}
 
+	public Query getQuery(){
+		Query q = new Query(Query.CREATE, curTable);
+		ArrayList<String> ops = main.getOperators();
+		ArrayList<String> values = main.getValues();
+		
+		for(int i = 0; i < attribNames.size(); i++){
+			q.addValue(attribTypes.get(i).intValue(), values.get(i));
+		}
+		
+		return q;
+	}
+	
 }

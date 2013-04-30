@@ -82,4 +82,23 @@ public class UpdateDialog extends SQLDialog{
 		
 	}
 	
+	public Query getQuery(){
+		Query q = new Query(Query.UPDATE, curTable);
+		ArrayList<String> conOps = conditions.getOperators();
+		ArrayList<String> conValues = conditions.getValues();
+		ArrayList<String> updOps = values.getOperators();
+		ArrayList<String> updValues = values.getValues();
+		
+		for(int i = 0; i < attribNames.size(); i++){
+			if(conValues.get(i).length() > 0){
+				q.addCondition(attribTypes.get(i).intValue(), attribNames.get(i), conOps.get(i), conValues.get(i));
+			}
+			if(updValues.get(i).length() > 0){
+				q.addUpdate(attribTypes.get(i).intValue(), attribNames.get(i), updOps.get(i), updValues.get(i));
+			}
+		}
+		
+		return q;
+	}
+	
 }

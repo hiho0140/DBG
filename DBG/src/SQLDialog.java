@@ -75,12 +75,17 @@ public abstract class SQLDialog extends JFrame{
 		updateAttribData();
 	}
 	
+	public abstract Query getQuery();
+	
 	public void finalize(){
 		this.pack();
 		this.setVisible(true);
 	}
 	
 	public void close(){
+		Core.core.updateTable(Core.core.runQuery(getQuery()));
+		Core.core.removeDialog(this);
 		this.dispose();
 	}
+	
 }

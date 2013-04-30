@@ -223,7 +223,7 @@ public class Core {
 	}
 	
 	public void closeDialog(SQLDialog dia){
-		dia.close();
+		dia.dispose();
 	}
 	
 	public ArrayList<String> getTableNames() throws SQLException{
@@ -238,11 +238,17 @@ public class Core {
 	}
 	
 	public ArrayList<String> getAttributeNames(String name) throws SQLException{
-		ResultSet rs = runQuery("SELECT column_name FROM information_schema.columns WHERE table_name = '" + name + "'");
+		ResultSet rs = runQuery("SELECT column_name FROM information_schema.columns WHERE table_name = '" + name + "';");
 		attributes.clear();
+		ArrayList<String> temp = new ArrayList<String>();
 		
 		while(rs.next()){
-			attributes.add(rs.getString(1));
+			temp.add(rs.getString(1));
+		}
+		
+		//Need to reverse the order of attribute names because the DB gives them to us backwards.
+		for(int i = temp.size() - 1; i >= 0; i--){
+			attributes.add(temp.get(i));
 		}
 		
 		return attributes;
@@ -262,6 +268,10 @@ public class Core {
 		}
 		
 		return types;
+	}
+	
+	public synchronized ResultSet runQuery(Query q){
+		return runQuery(q.toString());
 	}
 	
 	public synchronized ResultSet runQuery(String q){
@@ -296,12 +306,38 @@ public class Core {
 				case Types.BOOLEAN:
 					curResults.updateBoolean(column, ((Boolean)aValue).booleanValue());
 					break;
+				case Types.BIT:
+					curResults.updateBoolean(column, ((Boolean)aValue).booleanValue());
+					break;
 				default:
 					break;
 			}
 			
 			curResults.updateRow();
 			
+		}
+	}
+	
+	public void updateTable(ResultSet rs){
+		Vector<String> colNames = new Vector<String>();
+		Vector<Vector<String>> data = new Vector<Vector<String>>();
+		Vector<String> next;
+		
+		try {
+			while(rs.next()){
+				next = new Vector<String>();
+				for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
+					next.add(rs.getString(i));
+				}
+				data.add(next);
+			}
+			for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
+				colNames.add(rs.getMetaData().getColumnName(i));
+			}
+			updateTable(colNames, data);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -322,7 +358,7 @@ public class Core {
 		//stored serverside. Maybe just a quick "are you sure?"
 		
 		for(SQLDialog d : dialogs){
-			closeDialog(d);
+			d.dispose();
 		}
 		
 		window.dispose(); //lolnope

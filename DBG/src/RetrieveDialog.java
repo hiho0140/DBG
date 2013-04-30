@@ -40,7 +40,6 @@ public class RetrieveDialog extends SQLDialog{
 	public void close(){
 		// get the values from any contained QueryPanels
 		// and do something with them
-		
 		super.close();
 	}
 
@@ -53,6 +52,20 @@ public class RetrieveDialog extends SQLDialog{
 		main = new QueryPanel(attribNames, attribTypes, curTable);
 		this.add(main, BorderLayout.CENTER);
 		this.finalize();
+	}
+
+	public Query getQuery(){
+		Query q = new Query(Query.SELECT, curTable);
+		ArrayList<String> ops = main.getOperators();
+		ArrayList<String> values = main.getValues();
+		
+		for(int i = 0; i < attribNames.size(); i++){
+			if(values.get(i).length() > 0){
+				q.addCondition(attribTypes.get(i).intValue(), attribNames.get(i), ops.get(i), values.get(i));
+			}
+		}
+		
+		return q;
 	}
 
 }
