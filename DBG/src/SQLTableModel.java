@@ -14,12 +14,5 @@ public class SQLTableModel extends DefaultTableModel{
 		super(data, columnNames);
 	}
 	
-	public void setValueAt(Object aValue, int row, int column){
-		try {
-			Core.core.setValueAt(aValue, row, column);
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-		}
-	}
 	
 }

@@ -23,8 +23,8 @@ public class Core {
 	private Connection con;
 	private ResultSet curResults;
 	
-	public ArrayList<String> tables, attributes;
-	public ArrayList<Integer> types;
+	public ArrayList<String> tables, attribNames;
+	public ArrayList<Integer> attribTypes;
 	private Object[][] testdata = {{"herp","herp","herp","herp","herp"},{"derp","derp","derp","derp","derp"},{"wat","wat","wat","wat","wat"}};
 	
 	private NameManager nameMan = new NameManager();
@@ -32,7 +32,11 @@ public class Core {
 	//GUI components
 	private JButton newEntry, editEntry, delEntry, retEntry;
 	private JTable table;
+	private JScrollPane scroller;
 	private DefaultTableModel model;
+	private QuickPanel quickPanel;
+	private Sidebar quickBar;
+	private ResultBar resultBar;
 	public JFrame window;
 	
 	private ArrayList<SQLDialog> dialogs = new ArrayList<SQLDialog>();
@@ -69,18 +73,18 @@ public class Core {
 				tables.add("Table 2");
 				
 		//set up a dummy array of attribute names
-				attributes = new ArrayList<String>();
-				types = new ArrayList<Integer>();
-				attributes.add("attr1");
-				attributes.add("attr2");
-				attributes.add("attr3");
-				attributes.add("attr4");
-				attributes.add("attr5");
-				types.add(1);
-				types.add(2);
-				types.add(3);
-				types.add(4);
-				types.add(5);
+				attribNames = new ArrayList<String>();
+				attribTypes = new ArrayList<Integer>();
+				attribNames.add("attr1");
+				attribNames.add("attr2");
+				attribNames.add("attr3");
+				attribNames.add("attr4");
+				attribNames.add("attr5");
+				attribTypes.add(1);
+				attribTypes.add(2);
+				attribTypes.add(3);
+				attribTypes.add(4);
+				attribTypes.add(5);
 
 	}
 	
@@ -113,20 +117,19 @@ public class Core {
 		//=========================//
 		
 		//Put the table in a scrollpane so the column headers show up properly
-		model = new DefaultTableModel(testdata, attributes.toArray());
+		model = new DefaultTableModel(testdata, attribNames.toArray());
 		table = new JTable(model);
-		JScrollPane scroller = new JScrollPane(table);
+		scroller = new JScrollPane(table);
 		
 		
 		//========================//
 		//====== SIDE PANEL ======//
 		//========================//
 		
-		JPanel left = new JPanel();
-		left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-		
-		
-		
+		quickBar = new Sidebar();
+		window.add(quickBar, BorderLayout.WEST);
+		resultBar = new ResultBar();
+		window.add(resultBar, BorderLayout.EAST);
 		
 		//========================//
 		//===== CRUD BUTTONS =====//
@@ -237,9 +240,21 @@ public class Core {
 		return tables;
 	}
 	
+	public void updateAttributeNames() throws SQLException{
+		attribNames.clear();
+		
+		for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
+			attribNames.add(curResults.getMetaData().getColumnName(i));
+		}
+	}
+	
+	public ArrayList<String> getAttributeNames(){
+		return attribNames;
+	}
+	
 	public ArrayList<String> getAttributeNames(String name) throws SQLException{
 		ResultSet rs = runQuery("SELECT column_name FROM information_schema.columns WHERE table_name = '" + name + "';");
-		attributes.clear();
+		ArrayList<String> result = new ArrayList<String>();
 		ArrayList<String> temp = new ArrayList<String>();
 		
 		while(rs.next()){
@@ -248,10 +263,22 @@ public class Core {
 		
 		//Need to reverse the order of attribute names because the DB gives them to us backwards.
 		for(int i = temp.size() - 1; i >= 0; i--){
-			attributes.add(temp.get(i));
+			result.add(temp.get(i));
 		}
 		
-		return attributes;
+		return result;
+	}
+	
+	public void updateDataTypes() throws SQLException{
+		attribTypes.clear();
+		
+		for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
+			attribTypes.add(new Integer(curResults.getMetaData().getColumnType(i)));
+		}
+	}
+	
+	public ArrayList<Integer> getDataTypes(){
+		return attribTypes;
 	}
 	
 	public ArrayList<Integer> getDataTypes(String name) throws SQLException{
@@ -261,67 +288,44 @@ public class Core {
 		
 		ResultSet rs = runQuery("SELECT * from " + name + ";");
 		ResultSetMetaData rsmd = rs.getMetaData();
-		types.clear();
+		ArrayList<Integer> result = new ArrayList<Integer>();
 		
 		for(int i = 1; i <= rsmd.getColumnCount(); i++){
-			types.add(new Integer(rsmd.getColumnType(i)));
+			result.add(new Integer(rsmd.getColumnType(i)));
 		}
 		
-		return types;
+		return result;
 	}
 	
-	public synchronized ResultSet runQuery(Query q){
-		return runQuery(q.toString());
+	public synchronized void runDialogQuery(Query q){
+		runQuery(q.toString());
+		populateTable(curResults);
+		switchToTable();
 	}
 	
 	public synchronized ResultSet runQuery(String q){
 		Statement stmt;
 		try {
-			stmt = con.createStatement();
+			stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			curResults = stmt.executeQuery(q);
+			updateAttributeNames();
+			updateDataTypes();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 		return curResults;
 	}
 	
-	public void setValueAt(Object aValue, int row, int column) throws SQLException{
-		if(curResults != null){
-			
-			curResults.first();
-			for(int i = row - 1; i > 0; i--){
-				curResults.next();
-			}
-			
-			switch(curResults.getMetaData().getColumnType(column)){
-				case Types.INTEGER:
-					curResults.updateInt(column, ((Integer)aValue).intValue());
-					break;
-				case Types.DOUBLE:
-					curResults.updateDouble(column, ((Double)aValue).doubleValue());
-					break;
-				case Types.VARCHAR:
-					curResults.updateString(column, (String)aValue);
-					break;
-				case Types.BOOLEAN:
-					curResults.updateBoolean(column, ((Boolean)aValue).booleanValue());
-					break;
-				case Types.BIT:
-					curResults.updateBoolean(column, ((Boolean)aValue).booleanValue());
-					break;
-				default:
-					break;
-			}
-			
-			curResults.updateRow();
-			
-		}
+	public synchronized void runQuickQuery(String q){
+		runQuery(q);
+		populateFields(0);
+		switchToQuickPanel();
 	}
 	
-	public void updateTable(ResultSet rs){
-		Vector<String> colNames = new Vector<String>();
+	public void populateTable(ResultSet rs){
 		Vector<Vector<String>> data = new Vector<Vector<String>>();
 		Vector<String> next;
+		attribNames.clear();
 		
 		try {
 			while(rs.next()){
@@ -332,18 +336,53 @@ public class Core {
 				data.add(next);
 			}
 			for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
-				colNames.add(rs.getMetaData().getColumnName(i));
+				attribNames.add(rs.getMetaData().getColumnName(i));
 			}
-			updateTable(colNames, data);
+			populateTable(new Vector<String>(attribNames), data);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void updateTable(Vector<String> colNames, Vector<Vector<String>> data){
+	public void populateTable(Vector<String> colNames, Vector<Vector<String>> data){
 		model.setDataVector(data, colNames);
 		table.repaint();
+	}
+	
+	public void populateFields(int index){
+		ArrayList<String> data = new ArrayList<String>();
+		
+		try {
+			curResults.absolute(index + 1);
+			System.out.println(curResults.getMetaData().getColumnCount());
+			for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
+				data.add(curResults.getString(i));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		populateFields(attribNames, data);
+	}
+	
+	public void populateFields(ArrayList<String> colNames, ArrayList<String> data){
+		quickPanel = new QuickPanel(colNames, data);
+		switchToQuickPanel();
+		quickPanel.repaint();
+	}
+
+	public void switchToTable(){
+		quickPanel.setVisible(false);
+		resultBar.setEnabled(false);
+		scroller.setVisible(true);
+	}
+	
+	public void switchToQuickPanel(){
+		scroller.setVisible(false);
+		quickPanel.setVisible(true);
+		resultBar.setEnabled(true);
 	}
 	
 	public String getNiceName(String tableName, String attributeName){

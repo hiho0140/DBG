@@ -29,6 +29,7 @@ public class QueryPanel extends JPanel{
 	String[] numberOps = { "=", "!=", "<", "<=", ">", ">=", "IN" };
 	String[] stringOps = { "=", "!=", "LIKE", "NOT LIKE", "IN" };
 
+	//Query Mode Constructor
 	public QueryPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn) {
 		fields = new ArrayList<JTextField>();
 		operators = new ArrayList<JComboBox<String>>();

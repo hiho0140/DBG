@@ -17,11 +17,9 @@ public abstract class SQLDialog extends JFrame{
 	private JButton goButton;
 	
 	protected int mode;
-	public static final int GENERALIZED = 1, SPECIALIZED = 2;
+	
 	
 	public SQLDialog(){
-			mode = SQLDialog.GENERALIZED;
-		
 			try {
 				tableNames = Core.core.getTableNames();
 			} catch (SQLException e) {
@@ -44,8 +42,6 @@ public abstract class SQLDialog extends JFrame{
 	}
 	
 	public SQLDialog(ArrayList<String> n, ArrayList<String> nn, String tn){
-			mode = SQLDialog.SPECIALIZED;
-			
 			curTable = tn;
 			attribNames = n;
 			niceNames = nn;
@@ -83,7 +79,7 @@ public abstract class SQLDialog extends JFrame{
 	}
 	
 	public void close(){
-		Core.core.updateTable(Core.core.runQuery(getQuery()));
+		Core.core.runDialogQuery(getQuery());
 		Core.core.removeDialog(this);
 		this.dispose();
 	}
