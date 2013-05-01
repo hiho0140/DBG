@@ -33,7 +33,7 @@ public class QueryPanel extends JPanel{
 	String[] stringOps = { "=", "!=", "LIKE", "NOT LIKE", "IN" };
 
 	//Query Mode Constructor
-	public QueryPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn) {
+	public QueryPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn, boolean noOperators) {
 		fields = new ArrayList<JTextField>();
 		operators = new ArrayList<JComboBox>();
 		attributes = new ArrayList<String>(nl);
@@ -47,30 +47,34 @@ public class QueryPanel extends JPanel{
 			// Toss in an if/switch block later for this
 			fields.add(new JTextField(20));
 			
-			switch(types.get(i).intValue()){
-				case Types.BIT:
-					operators.add(new JComboBox(boolOps));
-					break;
-				case Types.BOOLEAN:
-					operators.add(new JComboBox(boolOps));
-					break;
-				case Types.INTEGER:
-					operators.add(new JComboBox(numberOps));
-					break;
-				case Types.DOUBLE:
-					operators.add(new JComboBox(numberOps));
-					break;
-				case Types.VARCHAR:
-					operators.add(new JComboBox(stringOps));
-					break;
-				default:
-					break;
-			}
-			
 			JPanel fieldPanel = new JPanel(new BorderLayout()), topPanel = new JPanel(), midPanel = new JPanel();
 			topPanel.setLayout(new GridLayout(1, 1));
 			topPanel.add(new JLabel(Core.core.getNiceName(tableName, attributes.get(i)), JLabel.LEFT));
-			midPanel.add(operators.get(i));
+			
+			if(!noOperators){
+				switch(types.get(i).intValue()){
+					case Types.BIT:
+						operators.add(new JComboBox(boolOps));
+						break;
+					case Types.BOOLEAN:
+						operators.add(new JComboBox(boolOps));
+						break;
+					case Types.INTEGER:
+						operators.add(new JComboBox(numberOps));
+						break;
+					case Types.DOUBLE:
+						operators.add(new JComboBox(numberOps));
+						break;
+					case Types.VARCHAR:
+						operators.add(new JComboBox(stringOps));
+						break;
+					default:
+						break;
+				}
+			
+				midPanel.add(operators.get(i));
+			}
+			
 			midPanel.add(fields.get(i));
 			
 			fieldPanel.add(topPanel, BorderLayout.NORTH);

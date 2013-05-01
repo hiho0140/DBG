@@ -10,7 +10,9 @@ public class CreateDialog extends SQLDialog{
 	private QueryPanel main;
 	
 	public CreateDialog() {
-		super();
+		super(false);
+		
+		this.setTitle("Create an Entry");
 
 		JPanel topPanel = new JPanel();
 		topPanel.add(new JLabel("Create new entry in"));
@@ -49,14 +51,13 @@ public class CreateDialog extends SQLDialog{
 		if(this.isAncestorOf(main)){
 			this.remove(main);
 		}
-		main = new QueryPanel(attribNames, attribTypes, curTable);
+		main = new QueryPanel(attribNames, attribTypes, curTable, true);
 		this.add(main, BorderLayout.CENTER);
 		this.finalize();
 	}
 
 	public Query getQuery(){
 		Query q = new Query(Query.CREATE, curTable);
-		ArrayList<String> ops = main.getOperators();
 		ArrayList<String> values = main.getValues();
 		
 		for(int i = 0; i < attribNames.size(); i++){

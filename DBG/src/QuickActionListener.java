@@ -3,7 +3,7 @@ import java.awt.event.ActionListener;
 
 public class QuickActionListener implements ActionListener {
 
-	public static final int CLOSEBUTTON = 1, COMBOBOX = 2, APPLYBUTTON = 3, REVERTBUTTON = 4;
+	public static final int CLOSEBUTTON = 1, COMBOBOX = 2, APPLYBUTTON = 3, REVERTBUTTON = 4, ADDBUTTON = 5, DELETEBUTTON = 6;
 	
 	private QuickPanel parent;
 	private int type;
@@ -18,6 +18,10 @@ public class QuickActionListener implements ActionListener {
 			parent.applyChanges();
 		}else if(type == REVERTBUTTON){
 			parent.revertChanges();
+		}else if(type == ADDBUTTON){
+			parent.addChanges();
+		}else if(type == DELETEBUTTON){
+			parent.removeEntry();
 		}
 	}
 

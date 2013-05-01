@@ -47,22 +47,22 @@ public class Query {
 	//Add a value to update a matching attribute to
 	//name = attribute name, op = operator, cond = conditional phrase
 	//Ex: addUpdate("firstName", "=", "'derp'");
-	public void addUpdate(int type, String name, String op, String val){
+	public void addUpdate(int type, String name, String val){
 		switch(type){
 		case Types.BIT:
-			updates.add(new String(name + " " + op + " " + val));
+			updates.add(new String(name + " = " + val));
 			break;
 		case Types.BOOLEAN:
-			updates.add(new String(name + " " + op + " " + val));
+			updates.add(new String(name + " = " + val));
 			break;
 		case Types.INTEGER:
-			updates.add(new String(name + " " + op + " " + val));
+			updates.add(new String(name + " = " + val));
 			break;
 		case Types.DOUBLE:
-			updates.add(new String(name + " " + op + " " + val));
+			updates.add(new String(name + " = " + val));
 			break;
 		case Types.VARCHAR:
-			updates.add(new String(name + " " + op + " '" + val + "'"));
+			updates.add(new String(name + " = '" + val + "'"));
 			break;
 		default:
 			break;
@@ -110,19 +110,19 @@ public class Query {
 			case UPDATE:
 				result = "UPDATE " + table + " SET " + getUpdates();
 				if(getConditions().length() > 0){
-					result = result + " WHERE " + getConditions();
+					result = result + getConditions();
 				}
 				result = result + ";";
 				break;
 			case SELECT:
 				result = "SELECT * FROM " + table;
 				if(getConditions().length() > 0){
-					result = result + " WHERE " + getConditions();
+					result = result + getConditions();
 				}
 				result = result + ";";
 				break;
 			case DELETE:
-				result = "DELETE FROM " + table + " WHERE " + getConditions() + ";";
+				result = "DELETE FROM " + table + " " + getConditions() + ";";
 				break;
 			case CREATE:
 				result = "INSERT INTO " + table + " VALUES (" + getValues() + ");";
@@ -146,13 +146,17 @@ public class Query {
 	}
 	
 	public String getConditions(){
-		String result  = new String();
+		String result = new String();
 		
 		for(int i = 0; i < conditions.size(); i++){
 			result = result + conditions.get(i);
 			if(i < conditions.size() - 1){
 				result = result + " and ";
 			}
+		}
+		
+		if(result.length() > 0){
+			result = "WHERE " + result;
 		}
 		
 		return result;

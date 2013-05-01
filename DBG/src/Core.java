@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,11 +18,14 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import org.postgresql.PGResultSetMetaData;
+
 public class Core {
 
 	public static Core core;
 	private Connection con;
 	private ResultSet curResults;
+	private SQLDialog dia;
 	
 	public ArrayList<String> tables, attribNames;
 	public ArrayList<Integer> attribTypes;
@@ -36,7 +40,14 @@ public class Core {
 	private DefaultTableModel model;
 	private QuickPanel quickPanel;
 	private Sidebar quickBar;
+	private JPanel centerPanel;
+	private CardLayout cl;
+	private JPanel rawPanel;
+	private JTextField rawField;
+	private JButton rawButton;
 	public JFrame window;
+	
+	public static final String TABLE = "table", QUICKPANEL = "quickpanel";
 	
 	private ArrayList<SQLDialog> dialogs = new ArrayList<SQLDialog>();
 	
@@ -101,21 +112,44 @@ public class Core {
 		//=========================//
 		
 		//Put the table in a scrollpane so the column headers show up properly
-		model = new DefaultTableModel(testdata, attribNames.toArray());
+		model = new DefaultTableModel(testdata, attribNames.toArray()){
+			public boolean isCellEditable(int row, int col){
+				return false;
+			}
+		};
 		table = new JTable(model);
 		scroller = new JScrollPane(table);
+		quickPanel = new QuickPanel();
 		
-		
+		cl = new CardLayout();
+		centerPanel = new JPanel(cl);
+		centerPanel.add(scroller, Core.TABLE);
+		centerPanel.add(quickPanel, Core.QUICKPANEL);
+
 		//========================//
 		//====== SIDE PANEL ======//
 		//========================//
 		
 		quickBar = new Sidebar();
-		window.add(quickBar, BorderLayout.WEST);
-		quickPanel = new QuickPanel();
-		window.add(quickPanel, BorderLayout.CENTER);
 		
 		
+		//=========================//
+		//======= RAW QUERY =======//
+		//=========================//
+					
+					rawPanel = new JPanel(new BorderLayout());
+					rawField = new JTextField();
+					rawButton = new JButton("GO");
+					rawButton.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent paramActionEvent) {
+							Core.core.runRawQuery();
+						}
+					});
+					
+					rawPanel.add(rawField, BorderLayout.CENTER);
+					rawPanel.add(rawButton, BorderLayout.EAST);
+		
+					
 		//========================//
 		//===== CRUD BUTTONS =====//
 		//========================//
@@ -157,7 +191,13 @@ public class Core {
 			buttonPanel.add(retEntry);
 			buttonPanel.add(editEntry);
 			buttonPanel.add(delEntry);
-		
+			
+			JPanel bottomPanel = new JPanel();
+			bottomPanel.setLayout(new BorderLayout());
+			bottomPanel.add(buttonPanel, BorderLayout.CENTER);
+			bottomPanel.add(rawPanel, BorderLayout.NORTH);
+
+			
 		//========================//
 		//====== FINALIZING ======//
 		//========================//
@@ -173,49 +213,46 @@ public class Core {
 			public void windowIconified(WindowEvent arg0) {}
 			public void windowOpened(WindowEvent arg0) {}
 		});
-		window.add(scroller, BorderLayout.CENTER);
-		window.add(buttonPanel, BorderLayout.SOUTH);
+
+		window.add(centerPanel, BorderLayout.CENTER);
+		window.add(bottomPanel, BorderLayout.SOUTH);
+		window.add(quickBar, BorderLayout.WEST);
 		window.setJMenuBar(menuBar);
-		window.setSize(800, 800);
+		window.setSize(600, 500);
 		window.setVisible(true);
 				
 	}
 	
 	public void spawnDialog(int type){
 		//not sure if memory leak :<
-		SQLDialog dia;
+		if(dia != null){
+			dia.dispose();
+		}
 		switch(type){
 			case 1:
 				dia = new CreateDialog();
-				dialogs.add(dia);
 				break;
 			case 2:
 				dia = new UpdateDialog();
-				dialogs.add(dia);
 				break;
 			case 3:
 				dia = new RetrieveDialog();
-				dialogs.add(dia);
 				break;
 			case 4:
 				dia = new DeleteDialog();
-				dialogs.add(dia);
 				break;
 			default:
 				break;
 		}
 	}
 	
-	public void removeDialog(SQLDialog dia){
-		dialogs.remove(dia);
-	}
-	
-	public void closeDialog(SQLDialog dia){
-		dia.dispose();
-	}
-	
-	public ArrayList<String> getTableNames() throws SQLException{
-		ResultSet rs = runQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' and table_type != 'view';");
+	public ArrayList<String> getTableNames(boolean includeViews) throws SQLException{
+		ResultSet rs;
+		if(includeViews){
+			rs = runQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';");
+		}else{
+			rs = runQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' and table_type != 'VIEW';");
+		}
 		tables.clear();
 		
 		while(rs.next()){
@@ -278,14 +315,7 @@ public class Core {
 		for(int i = 1; i <= rsmd.getColumnCount(); i++){
 			result.add(new Integer(rsmd.getColumnType(i)));
 		}
-		
 		return result;
-	}
-	
-	public synchronized void runDialogQuery(Query q){
-		runQuery(q.toString());
-		populateTable(curResults);
-		switchToTable();
 	}
 	
 	public synchronized ResultSet runQuery(String q){
@@ -296,15 +326,48 @@ public class Core {
 			updateAttributeNames();
 			updateDataTypes();
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
+			if(!(!q.startsWith("SELECT") && e.getMessage().equals("No results were returned by the query."))){
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, e.getMessage());
+			}
+		}
+		rawField.setText(q);
+		return curResults;
+	}
+	
+	public synchronized ResultSet runSilentQuery(String q){
+		Statement stmt;
+		try {
+			stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			curResults = stmt.executeQuery(q);
+			updateAttributeNames();
+			updateDataTypes();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return curResults;
 	}
 	
-	public synchronized void runQuickQuery(String q){
+	public synchronized void runDialogQuery(Query q){
+		runQuery(q.toString());
+		populateTable(curResults);
+		switchToTable();
+	}
+	
+	public void runDialogQuery(String string) {
+		runQuery(string);
+		populateTable(curResults);
+		switchToTable();
+	}
+	
+	public synchronized void runQuickQuery(String q, String n, boolean b){
 		runQuery(q);
-		populateFields(0);
+		generateQuickPanel(0, n, b, q);
 		switchToQuickPanel();
+	}
+	
+	public synchronized void runRawQuery(){
+		runDialogQuery(rawField.getText());
 	}
 	
 	public void populateTable(ResultSet rs){
@@ -335,41 +398,103 @@ public class Core {
 		table.repaint();
 	}
 	
-	public void populateFields(int index){
-		ArrayList<String> data = new ArrayList<String>();
-		
+	public void generateQuickPanel(int index){
+		if(index >= 0){
+			ArrayList<String> data = new ArrayList<String>();
+			
+			try {
+				curResults.absolute(index + 1);
+				for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
+					data.add(curResults.getString(i));
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			quickPanel.populateFields(data);
+		}
+	}
+	
+	public void generateQuickPanel(int index, String n, boolean b, String q){
 		try {
-			curResults.absolute(index + 1);
-			System.out.println(curResults.getMetaData().getColumnCount());
-			for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
-				data.add(curResults.getString(i));
+			if(curResults.getMetaData().getColumnCount() > 0){
+				quickPanel.setTable((((PGResultSetMetaData)curResults.getMetaData()).getBaseTableName(1)));
+				populateQuickPanel(getAttributeNames(), getDataTypes(), getRowArrayList(index));
+				quickPanel.updateList(getResultList(n));
+				quickPanel.setQuery(q);
+				quickPanel.setListName(n);
+				quickPanel.setCanApply(b);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		populateFields(attribNames, data);
 	}
 	
-	public void populateFields(ArrayList<String> colNames, ArrayList<String> data){
-		quickPanel.updateFields(colNames, data);
-		switchToQuickPanel();
-		quickPanel.repaint();
+	public void populateQuickPanel(ArrayList<String> colNames, ArrayList<Integer> types, ArrayList<String> data){
+		quickPanel.generateFields(colNames, types);
+		quickPanel.populateFields(data);
+	}
+	
+	public void switchView(){
+		cl.next(centerPanel);
 	}
 
 	public void switchToTable(){
-		quickPanel.setVisible(false);
-		scroller.setVisible(true);
+		cl.show(centerPanel, Core.TABLE);
 	}
 	
 	public void switchToQuickPanel(){
-		scroller.setVisible(false);
-		quickPanel.setVisible(true);
+		cl.show(centerPanel, Core.QUICKPANEL);
 	}
 	
 	public String getNiceName(String tableName, String attributeName){
 		return nameMan.getNameFor(tableName, attributeName);
+	}
+	
+	public ArrayList<String> getRowArrayList(int index){
+		ArrayList<String> results = new ArrayList<String>();
+		try {
+			curResults.absolute(index + 1);
+			for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
+				results.add(curResults.getString(i));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return results;
+	}
+	
+	public Vector<String> getRowVector(int index){
+		Vector<String> results = new Vector<String>();
+		try {
+			curResults.absolute(index);
+			for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
+				results.add(curResults.getString(i));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return results;
+	}
+	
+	public ArrayList<String> getResultList(String n){
+		ArrayList<String> result = new ArrayList<String>();
+		
+		try {
+			curResults.first();
+			do{
+				result.add(curResults.getString(n));
+			}while(curResults.next());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	public void quitProgram(){
@@ -379,11 +504,10 @@ public class Core {
 		//Shouldn't need any save checks here, since everything is
 		//stored serverside. Maybe just a quick "are you sure?"
 		
-		for(SQLDialog d : dialogs){
-			d.dispose();
+		if(dia != null){
+			dia.dispose();
 		}
-		
-		window.dispose(); //lolnope
+		window.dispose();
 	}
-	
+
 }

@@ -1,32 +1,41 @@
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
 public class UpdateDialog extends SQLDialog{
 	
 	private QueryPanel conditions, values;
-	private JPanel main, topPanel, lowerPanel;
+	private JPanel main, topPanel, leftPanel, rightPanel;
 
 	public UpdateDialog() {
-		super();
+		super(false);
+
+		this.setTitle("Update Entries");
 		
-		main = new JPanel(new GridLayout(2, 1));
+		main = new JPanel(new GridLayout(1, 2));
 		topPanel = new JPanel();
-		lowerPanel = new JPanel(new BorderLayout());
+		leftPanel = new JPanel(new BorderLayout());
+		rightPanel = new JPanel(new BorderLayout());
 		
 		topPanel.add(new JLabel("Update entries in"));
 		topPanel.add(tables);
-		topPanel.add(new JLabel("where"));
 		topPanel.setBorder(BorderFactory.createEtchedBorder());
 		
-		lowerPanel.setBorder(BorderFactory.createEtchedBorder());
-		lowerPanel.add(new JLabel("Update to:"), BorderLayout.NORTH);
-		main.add(lowerPanel, 1, 0);
+		leftPanel.setBorder(BorderFactory.createEtchedBorder());
+		leftPanel.add(new JLabel("Where:"), BorderLayout.NORTH);
+		rightPanel.setBorder(BorderFactory.createEtchedBorder());
+		rightPanel.add(new JLabel("Update To:"), BorderLayout.NORTH);
+		
+		main.add(leftPanel, 0, 0);
+		main.add(rightPanel, 0, 1);
 		
 		updateQueryPanels();
 		
@@ -38,16 +47,20 @@ public class UpdateDialog extends SQLDialog{
 	public UpdateDialog(ArrayList<String> n, ArrayList<String> nn, String tn) {
 		super(n, nn, tn);
 		
-		main = new JPanel(new GridLayout(2, 1));
+		main = new JPanel(new GridLayout(1, 2));
 		topPanel = new JPanel();
-		lowerPanel = new JPanel(new BorderLayout());
+		leftPanel = new JPanel(new BorderLayout());
 		
-		topPanel.add(new JLabel("Update entries in " + curTable + " where"));
+		topPanel.add(new JLabel("Update entries in " + curTable));
 		topPanel.setBorder(BorderFactory.createEtchedBorder());
 		
-		lowerPanel.setBorder(BorderFactory.createEtchedBorder());
-		lowerPanel.add(new JLabel("Update to:"), BorderLayout.NORTH);
-		main.add(lowerPanel, 1, 0);
+		leftPanel.setBorder(BorderFactory.createEtchedBorder());
+		leftPanel.add(new JLabel("Where:"), BorderLayout.NORTH);
+		rightPanel.setBorder(BorderFactory.createEtchedBorder());
+		rightPanel.add(new JLabel("Update To:"), BorderLayout.NORTH);
+		
+		main.add(leftPanel, 0, 0);
+		main.add(rightPanel, 0, 1);
 		
 		updateQueryPanels();
 		
@@ -59,25 +72,28 @@ public class UpdateDialog extends SQLDialog{
 	public void close(){
 		// get the values from any contained QueryPanels
 		// and do something with them
-		
-		super.close();
+		if(doUpdateConfirm() == JOptionPane.YES_OPTION){
+			super.close();
+		}else{
+			this.dispose();
+		}
 	}
 
 	public void updateQueryPanels() {
 		super.updateQueryPanels();
 		
-		if(lowerPanel.isAncestorOf(values)){
-			lowerPanel.remove(values);
+		if(leftPanel.isAncestorOf(conditions)){
+			leftPanel.remove(conditions);
 		}
-		if(main.isAncestorOf(conditions)){
-			main.remove(conditions);
+		if(rightPanel.isAncestorOf(values)){
+			rightPanel.remove(values);
 		}
 		
-		values = new QueryPanel(attribNames, attribTypes, curTable);
-		conditions = new QueryPanel(attribNames, attribTypes, curTable);
+		values = new QueryPanel(attribNames, attribTypes, curTable, true);
+		conditions = new QueryPanel(attribNames, attribTypes, curTable, false);
 		
-		lowerPanel.add(values, BorderLayout.CENTER);
-		main.add(conditions, 0, 0);
+		leftPanel.add(conditions, BorderLayout.CENTER);
+		rightPanel.add(values, BorderLayout.CENTER);
 		this.finalize();
 		
 	}
@@ -86,7 +102,6 @@ public class UpdateDialog extends SQLDialog{
 		Query q = new Query(Query.UPDATE, curTable);
 		ArrayList<String> conOps = conditions.getOperators();
 		ArrayList<String> conValues = conditions.getValues();
-		ArrayList<String> updOps = values.getOperators();
 		ArrayList<String> updValues = values.getValues();
 		
 		for(int i = 0; i < attribNames.size(); i++){
@@ -94,11 +109,32 @@ public class UpdateDialog extends SQLDialog{
 				q.addCondition(attribTypes.get(i).intValue(), attribNames.get(i), conOps.get(i), conValues.get(i));
 			}
 			if(updValues.get(i).length() > 0){
-				q.addUpdate(attribTypes.get(i).intValue(), attribNames.get(i), updOps.get(i), updValues.get(i));
+				q.addUpdate(attribTypes.get(i).intValue(), attribNames.get(i), updValues.get(i));
 			}
 		}
 		
 		return q;
+	}
+	
+	private int doUpdateConfirm(){
+		if(getQuery().getUpdates().length() > 0){
+			return JOptionPane.showConfirmDialog(null, "This will update " + getUpdateCount() + " rows. Continue?",
+						"Confirm Action", JOptionPane.YES_NO_OPTION);
+		}else{
+			return JOptionPane.NO_OPTION;
+		}
+	}
+	
+	private int getUpdateCount(){
+		ResultSet rs = Core.core.runQuery("SELECT COUNT(*) from " + curTable + " " + getQuery().getConditions() + ";");
+		try {
+			rs.next();
+			return rs.getInt(1);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
 	}
 	
 }

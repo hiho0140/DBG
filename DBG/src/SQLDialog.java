@@ -19,9 +19,9 @@ public abstract class SQLDialog extends JFrame{
 	protected int mode;
 	
 	
-	public SQLDialog(){
+	public SQLDialog(boolean includeViews){
 			try {
-				tableNames = Core.core.getTableNames();
+				tableNames = Core.core.getTableNames(includeViews);
 			} catch (SQLException e) {
 				tableNames = new ArrayList<String>();
 			}
@@ -80,7 +80,9 @@ public abstract class SQLDialog extends JFrame{
 	
 	public void close(){
 		Core.core.runDialogQuery(getQuery());
-		Core.core.removeDialog(this);
+		if(getQuery().getType() != Query.SELECT){
+			Core.core.runDialogQuery("SELECT * from " + curTable + ";");
+		}
 		this.dispose();
 	}
 	

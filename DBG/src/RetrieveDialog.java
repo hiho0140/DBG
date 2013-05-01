@@ -10,7 +10,9 @@ public class RetrieveDialog extends SQLDialog{
 	private QueryPanel main;
 
 	public RetrieveDialog() {
-		super();
+		super(true);
+
+		this.setTitle("View Entries");
 		
 		JPanel topPanel = new JPanel();		
 		topPanel.add(new JLabel("Retrieve entries from"));
@@ -49,7 +51,7 @@ public class RetrieveDialog extends SQLDialog{
 		if(this.isAncestorOf(main)){
 			this.remove(main);
 		}
-		main = new QueryPanel(attribNames, attribTypes, curTable);
+		main = new QueryPanel(attribNames, attribTypes, curTable, false);
 		this.add(main, BorderLayout.CENTER);
 		this.finalize();
 	}
