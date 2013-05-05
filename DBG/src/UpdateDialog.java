@@ -8,17 +8,18 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
+import javax.swing.JScrollPane;
 
 public class UpdateDialog extends SQLDialog{
 	
 	private QueryPanel conditions, values;
+	private JScrollPane condScroll, valScroll;
 	private JPanel main, topPanel, leftPanel, rightPanel;
-
-	public UpdateDialog() {
-		super(false);
-
-		this.setTitle("Update Entries");
+	
+	public UpdateDialog(SQLFrame p) {
+		super(false, p);
+		
+		title = "Update Entries";
 		
 		main = new JPanel(new GridLayout(1, 2));
 		topPanel = new JPanel();
@@ -44,8 +45,8 @@ public class UpdateDialog extends SQLDialog{
 		this.finalize();
 	}
 	
-	public UpdateDialog(ArrayList<String> n, ArrayList<String> nn, String tn) {
-		super(n, nn, tn);
+	public UpdateDialog(ArrayList<String> n, ArrayList<String> nn, String tn, SQLFrame p) {
+		super(n, nn, tn, p);
 		
 		main = new JPanel(new GridLayout(1, 2));
 		topPanel = new JPanel();
@@ -75,25 +76,28 @@ public class UpdateDialog extends SQLDialog{
 		if(doUpdateConfirm() == JOptionPane.YES_OPTION){
 			super.close();
 		}else{
-			this.dispose();
+			//this.dispose();
 		}
 	}
 
 	public void updateQueryPanels() {
 		super.updateQueryPanels();
 		
-		if(leftPanel.isAncestorOf(conditions)){
-			leftPanel.remove(conditions);
+		if(leftPanel.isAncestorOf(condScroll)){
+			leftPanel.remove(condScroll);
 		}
-		if(rightPanel.isAncestorOf(values)){
-			rightPanel.remove(values);
+		if(rightPanel.isAncestorOf(valScroll)){
+			rightPanel.remove(valScroll);
 		}
 		
 		values = new QueryPanel(attribNames, attribTypes, curTable, true);
 		conditions = new QueryPanel(attribNames, attribTypes, curTable, false);
 		
-		leftPanel.add(conditions, BorderLayout.CENTER);
-		rightPanel.add(values, BorderLayout.CENTER);
+		valScroll = new JScrollPane(values);
+		condScroll = new JScrollPane(conditions);
+		
+		leftPanel.add(condScroll, BorderLayout.CENTER);
+		rightPanel.add(valScroll, BorderLayout.CENTER);
 		this.finalize();
 		
 	}

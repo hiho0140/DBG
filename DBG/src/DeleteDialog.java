@@ -7,16 +7,17 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 
 public class DeleteDialog extends SQLDialog{
 
 	private QueryPanel main;
+	private JScrollPane mainScroll;
 	
-	public DeleteDialog() {
-		super(false);
-
-		this.setTitle("Delete Entries");
+	public DeleteDialog(SQLFrame p) {
+		super(false, p);
+		title = "Delete Entries";
 		
 		JPanel topPanel = new JPanel();		
 		topPanel.add(new JLabel("Delete entries from"));
@@ -30,8 +31,8 @@ public class DeleteDialog extends SQLDialog{
 		this.finalize();
 	}
 	
-	public DeleteDialog(ArrayList<String> n, ArrayList<String> nn, String tn) {
-		super(n, nn, tn);
+	public DeleteDialog(ArrayList<String> n, ArrayList<String> nn, String tn, SQLFrame p) {
+		super(n, nn, tn, p);
 		
 		JPanel topPanel = new JPanel();		
 		topPanel.add(new JLabel("Delete entries from " + curTable + " where"));
@@ -49,18 +50,19 @@ public class DeleteDialog extends SQLDialog{
 		if(doUpdateConfirm() == JOptionPane.YES_OPTION){
 			super.close();
 		}else{
-			this.dispose();
+			//this.dispose();
 		}
 	}
 
 	public void updateQueryPanels() {
 		super.updateQueryPanels();
 		
-		if(this.isAncestorOf(main)){
-			this.remove(main);
+		if(this.isAncestorOf(mainScroll)){
+			this.remove(mainScroll);
 		}
 		main = new QueryPanel(attribNames, attribTypes, curTable, false);
-		this.add(main, BorderLayout.CENTER);
+		mainScroll = new JScrollPane(main);
+		this.add(mainScroll, BorderLayout.CENTER);
 		this.finalize();
 	}
 	

@@ -25,7 +25,7 @@ public class Core {
 	public static Core core;
 	private Connection con;
 	private ResultSet curResults;
-	private SQLDialog dia;
+	private SQLFrame dia;
 	
 	public ArrayList<String> tables, attribNames;
 	public ArrayList<Integer> attribTypes;
@@ -223,23 +223,27 @@ public class Core {
 				
 	}
 	
-	public void spawnDialog(int type){
+	public synchronized void spawnDialog(int type){
 		//not sure if memory leak :<
-		if(dia != null){
-			dia.dispose();
+		if(dia == null){
+			dia = new SQLFrame();
 		}
 		switch(type){
 			case 1:
-				dia = new CreateDialog();
+				//dia = new CreateDialog();
+				dia.setDialog(new CreateDialog(dia));
 				break;
 			case 2:
-				dia = new UpdateDialog();
+				dia.setDialog(new UpdateDialog(dia));
+				//dia = new UpdateDialog();
 				break;
 			case 3:
-				dia = new RetrieveDialog();
+				dia.setDialog(new RetrieveDialog(dia));
+				//dia = new RetrieveDialog();
 				break;
 			case 4:
-				dia = new DeleteDialog();
+				dia.setDialog(new DeleteDialog(dia));
+				//dia = new DeleteDialog();
 				break;
 			default:
 				break;

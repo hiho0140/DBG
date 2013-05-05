@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class RetrieveDialog extends SQLDialog{
 	
 	private QueryPanel main;
+	private JScrollPane mainScroll;
+	
+	public RetrieveDialog(SQLFrame p) {
+		super(true, p);
+		title = "View Entries";
 
-	public RetrieveDialog() {
-		super(true);
-
-		this.setTitle("View Entries");
-		
 		JPanel topPanel = new JPanel();		
 		topPanel.add(new JLabel("Retrieve entries from"));
 		topPanel.add(tables);
@@ -26,8 +27,8 @@ public class RetrieveDialog extends SQLDialog{
 		this.finalize();
 	}
 	
-	public RetrieveDialog(ArrayList<String> n, ArrayList<String> nn, String tn) {
-		super(n, nn, tn);
+	public RetrieveDialog(ArrayList<String> n, ArrayList<String> nn, String tn, SQLFrame p) {
+		super(n, nn, tn, p);
 		
 		JPanel topPanel = new JPanel();		
 		topPanel.add(new JLabel("Retrieve entries from " + curTable + " where"));
@@ -48,11 +49,12 @@ public class RetrieveDialog extends SQLDialog{
 	public void updateQueryPanels() {
 		super.updateQueryPanels();
 		
-		if(this.isAncestorOf(main)){
-			this.remove(main);
+		if(this.isAncestorOf(mainScroll)){
+			this.remove(mainScroll);
 		}
 		main = new QueryPanel(attribNames, attribTypes, curTable, false);
-		this.add(main, BorderLayout.CENTER);
+		mainScroll = new JScrollPane(main);
+		this.add(mainScroll, BorderLayout.CENTER);
 		this.finalize();
 	}
 

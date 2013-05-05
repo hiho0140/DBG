@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class CreateDialog extends SQLDialog{
 
 	private QueryPanel main;
+	private JScrollPane mainScroll;
 	
-	public CreateDialog() {
-		super(false);
-		
-		this.setTitle("Create an Entry");
+	public CreateDialog(SQLFrame p) {
+		super(false, p);
+		title = "Create an Entry";
 
 		JPanel topPanel = new JPanel();
 		topPanel.add(new JLabel("Create new entry in"));
@@ -25,8 +26,8 @@ public class CreateDialog extends SQLDialog{
 		this.finalize();
 	}
 	
-	public CreateDialog(ArrayList<String> n, ArrayList<String> nn, String tn) {
-		super(n, nn, tn);
+	public CreateDialog(ArrayList<String> n, ArrayList<String> nn, String tn, SQLFrame p) {
+		super(n, nn, tn, p);
 
 		JPanel topPanel = new JPanel();
 		topPanel.add(new JLabel("Create new entry in " + curTable));
@@ -48,11 +49,12 @@ public class CreateDialog extends SQLDialog{
 	public void updateQueryPanels(){
 		super.updateQueryPanels();
 		
-		if(this.isAncestorOf(main)){
-			this.remove(main);
+		if(this.isAncestorOf(mainScroll)){
+			this.remove(mainScroll);
 		}
 		main = new QueryPanel(attribNames, attribTypes, curTable, true);
-		this.add(main, BorderLayout.CENTER);
+		mainScroll = new JScrollPane(main);
+		this.add(mainScroll, BorderLayout.CENTER);
 		this.finalize();
 	}
 
