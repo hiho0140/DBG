@@ -25,10 +25,10 @@ public class Query {
 	public void addCondition(int type, String name, String op, String val){
 		switch(type){
 			case Types.BIT:
-				conditions.add(new String(name + " " + op + " " + val));
+				conditions.add(new String(name + " " + op + " '" + val + "'"));
 				break;
 			case Types.BOOLEAN:
-				conditions.add(new String(name + " " + op + " " + val));
+				conditions.add(new String(name + " " + op + " '" + val + "'"));
 				break;
 			case Types.INTEGER:
 				conditions.add(new String(name + " " + op + " " + val));
@@ -50,10 +50,10 @@ public class Query {
 	public void addUpdate(int type, String name, String val){
 		switch(type){
 		case Types.BIT:
-			updates.add(new String(name + " = " + val));
+			updates.add(new String(name + " = '" + val + "'"));
 			break;
 		case Types.BOOLEAN:
-			updates.add(new String(name + " = " + val));
+			updates.add(new String(name + " = '" + val + "'"));
 			break;
 		case Types.INTEGER:
 			updates.add(new String(name + " = " + val));
@@ -72,10 +72,10 @@ public class Query {
 	public void addValue(int type, String val){
 		switch(type){
 		case Types.BIT:
-			values.add(new String(val));
+			values.add(new String("'" + val + "'"));
 			break;
 		case Types.BOOLEAN:
-			values.add(new String(val));
+			values.add(new String("'" + val + "'"));
 			break;
 		case Types.INTEGER:
 			values.add(new String(val));
@@ -156,7 +156,7 @@ public class Query {
 		}
 		
 		if(result.length() > 0){
-			result = "WHERE " + result;
+			result = " WHERE " + result;
 		}
 		
 		return result;

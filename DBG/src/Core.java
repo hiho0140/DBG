@@ -23,7 +23,7 @@ import org.postgresql.PGResultSetMetaData;
 public class Core {
 
 	public static Core core;
-	private Connection con;
+	private static Connection con;
 	private ResultSet curResults;
 	private SQLFrame dia;
 	
@@ -53,34 +53,37 @@ public class Core {
 	
 	public static void main(String[] args){
 		
-		core = new Core();
-		core.initGUI();
+		SQLLogin log = new SQLLogin();
+		if(JOptionPane.showConfirmDialog(null, log, "Login", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION){
+			//Connect to the database
+			try {
+				Class.forName("org.postgresql.Driver");
+				
+				String un = log.getUsername();
+				String ps = log.getPassword();
+				con = DriverManager.getConnection(
+				        "jdbc:postgresql://reddwarf.cs.rit.edu/" + un,
+				        un,
+				        ps);
+				core = new Core();
+				core.initGUI();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, e.getMessage());
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 	}
 	
 	public Core(){
-		
-		//Connect to the database
-		
-		try {
-			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(
-			        "jdbc:postgresql://reddwarf.cs.rit.edu/p48501m",
-			        "p48501m",
-			        "herpderp");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
 		//Initialize Shtuff
-				tables = new ArrayList<String>();
-				attribNames = new ArrayList<String>();
-				attribTypes = new ArrayList<Integer>();
+		tables = new ArrayList<String>();
+		attribNames = new ArrayList<String>();
+		attribTypes = new ArrayList<Integer>();
 	}
 	
 	private void initGUI(){
@@ -137,65 +140,65 @@ public class Core {
 		//======= RAW QUERY =======//
 		//=========================//
 					
-					rawPanel = new JPanel(new BorderLayout());
-					rawField = new JTextField();
-					rawButton = new JButton("GO");
-					rawButton.addActionListener(new ActionListener(){
-						public void actionPerformed(ActionEvent paramActionEvent) {
-							Core.core.runRawQuery();
-						}
-					});
-					
-					rawPanel.add(rawField, BorderLayout.CENTER);
-					rawPanel.add(rawButton, BorderLayout.EAST);
+		rawPanel = new JPanel(new BorderLayout());
+		rawField = new JTextField();
+		rawButton = new JButton("GO");
+		rawButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent paramActionEvent) {
+				Core.core.runRawQuery();
+			}
+		});
+		
+		rawPanel.add(rawField, BorderLayout.CENTER);
+		rawPanel.add(rawButton, BorderLayout.EAST);
 		
 					
 		//========================//
 		//===== CRUD BUTTONS =====//
 		//========================//
 		
-			newEntry = new JButton("Add Entry");
-			newEntry.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					Core.core.spawnDialog(1);
-				}
-			});
-			
-			editEntry = new JButton("Update Entries");
-			editEntry.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					Core.core.spawnDialog(2);
-				}
-			});
-			
-			retEntry = new JButton("View Entries");
-			retEntry.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					Core.core.spawnDialog(3);
-				}
-			});
-			
-			delEntry = new JButton("Delete Entries");
-			delEntry.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					Core.core.spawnDialog(4);
-				}
-			});
-			
-			JPanel buttonPanel = new JPanel();
-			GridLayout bpLayout = new GridLayout(2, 2);
-			bpLayout.setHgap(10);
-			bpLayout.setVgap(10);
-			buttonPanel.setLayout(bpLayout);
-			buttonPanel.add(newEntry);
-			buttonPanel.add(retEntry);
-			buttonPanel.add(editEntry);
-			buttonPanel.add(delEntry);
-			
-			JPanel bottomPanel = new JPanel();
-			bottomPanel.setLayout(new BorderLayout());
-			bottomPanel.add(buttonPanel, BorderLayout.CENTER);
-			bottomPanel.add(rawPanel, BorderLayout.NORTH);
+		newEntry = new JButton("Add Entry");
+		newEntry.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				Core.core.spawnDialog(1);
+			}
+		});
+		
+		editEntry = new JButton("Update Entries");
+		editEntry.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				Core.core.spawnDialog(2);
+			}
+		});
+		
+		retEntry = new JButton("View Entries");
+		retEntry.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				Core.core.spawnDialog(3);
+			}
+		});
+		
+		delEntry = new JButton("Delete Entries");
+		delEntry.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				Core.core.spawnDialog(4);
+			}
+		});
+		
+		JPanel buttonPanel = new JPanel();
+		GridLayout bpLayout = new GridLayout(2, 2);
+		bpLayout.setHgap(10);
+		bpLayout.setVgap(10);
+		buttonPanel.setLayout(bpLayout);
+		buttonPanel.add(newEntry);
+		buttonPanel.add(retEntry);
+		buttonPanel.add(editEntry);
+		buttonPanel.add(delEntry);
+		
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BorderLayout());
+		bottomPanel.add(buttonPanel, BorderLayout.CENTER);
+		bottomPanel.add(rawPanel, BorderLayout.NORTH);
 
 			
 		//========================//
