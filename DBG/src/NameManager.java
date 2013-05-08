@@ -113,22 +113,30 @@ public class NameManager {
 		curMap.put("season_no", "Season #");
 		curMap.put("result", "Result");
 		curMap.put("team", "Team");
-		curMap.put("rf", "");
-		curMap.put("ra", "");
+		curMap.put("rf", "Rounds Won");
+		curMap.put("ra", "Rounds Lost");
 		curMap.put("opponent", "Opponent");
 		curMap.put("map", "Map");
 
 	}
 	
 	public String getNameFor(String tableName, String attributeName){
-		if(names.containsKey(tableName)){
-			if(names.get(tableName).containsKey(attributeName)){
-				return names.get(tableName).get(attributeName);
-			}else{
-				return new String();
-			}
+		if(hasNameFor(tableName, attributeName)){
+			return names.get(tableName).get(attributeName);
 		}else{
 			return new String();
+		}
+	}
+	
+	public boolean hasNameFor(String tableName, String attributeName){
+		if(names.containsKey(tableName)){
+			if(names.get(tableName).containsKey(attributeName)){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
 		}
 	}
 	

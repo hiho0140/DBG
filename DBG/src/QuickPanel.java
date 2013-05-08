@@ -1,4 +1,6 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Types;
@@ -11,7 +13,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 
 public class QuickPanel extends JPanel{
 
@@ -22,7 +26,8 @@ public class QuickPanel extends JPanel{
 	private JButton commit, revert, add, delete;
 	private JPanel centerPanel, lowerPanel;
 	private ResultBar resultBar;
-	private String curTable, myQuery, listName;
+	private String curTable, myQuery;
+	private String[] primaryKey;
 	private boolean allowUpdate;
 	
 	
@@ -33,7 +38,7 @@ public class QuickPanel extends JPanel{
 		this.setLayout(new BorderLayout());
 		this.setBorder(BorderFactory.createEtchedBorder());
 		
-		resultBar = new ResultBar();
+		resultBar = new ResultBar(ResultBarSelectionListener.TABLE);
 		fields = new ArrayList<JTextField>();
 		
 		centerPanel = new JPanel();
@@ -66,16 +71,21 @@ public class QuickPanel extends JPanel{
 		allowUpdate = b;
 	}
 	
-	public void setTable(String tn){
+	public void setTableName(String tn){
 		curTable = tn;
 	}
 	
 	public void setListName(String ln){
-		listName = ln;
+		primaryKey = new String[1];
+		primaryKey[0] = ln;
+	}
+	
+	public void setListName(String[] ln){
+		primaryKey = ln;
 	}
 	
 	public void updateList(ArrayList<String> nl){
-		resultBar.setData(new Vector<String>(nl));
+		resultBar.setData(new Vector<String>(nl), primaryKey);
 	}
 	
 	public void generateFields(ArrayList<String> nl, ArrayList<Integer> tl){
@@ -85,17 +95,28 @@ public class QuickPanel extends JPanel{
 	
 		this.remove(centerPanel);
 		
-		centerPanel = new JPanel();
+		GridLayout theGrid = new GridLayout(0, 3);
+		theGrid.setHgap(10);
+		theGrid.setVgap(5);
+		centerPanel = new JPanel(theGrid);
 		fields.clear();
 		
 		for(int i = 0; i < nl.size(); i++){
 
 			fields.add(new JTextField(15));
 			JPanel fieldPanel = new JPanel();
-			fieldPanel.setBorder(BorderFactory.createEtchedBorder());
-			fieldPanel.add(new JLabel(Core.core.getNiceName(curTable,  nl.get(i)), JLabel.RIGHT));
-			fieldPanel.add(fields.get(i));
+			SpringLayout sl = new SpringLayout();
+			JLabel fieldLabel = new JLabel(Core.core.getNiceName(curTable, nl.get(i)));
 			
+			sl.putConstraint(SpringLayout.HORIZONTAL_CENTER, fieldLabel, 0, SpringLayout.HORIZONTAL_CENTER, fieldPanel);
+			sl.putConstraint(SpringLayout.NORTH, fieldLabel, 5, SpringLayout.NORTH, fieldPanel);
+			sl.putConstraint(SpringLayout.HORIZONTAL_CENTER, fields.get(i), 0, SpringLayout.HORIZONTAL_CENTER, fieldPanel);
+			sl.putConstraint(SpringLayout.NORTH, fields.get(i), 5, SpringLayout.SOUTH, fieldLabel);
+			
+			fieldPanel.setLayout(sl);
+			//fieldPanel.setBorder(BorderFactory.createEtchedBorder());
+			fieldPanel.add(fieldLabel);
+			fieldPanel.add(fields.get(i));
 			centerPanel.add(fieldPanel);
 		}
 		
@@ -104,7 +125,7 @@ public class QuickPanel extends JPanel{
 	}
 	
 	public void populateFields(int index){
-		Core.core.generateQuickPanel(index);
+		Core.core.populateQuickPanel(index);
 	}
 	
 	public void populateFields(ArrayList<String> vl){
@@ -163,7 +184,7 @@ public class QuickPanel extends JPanel{
 	
 	public void repeatQuery(){
 		int temp = resultBar.getSelectedIndex();
-		Core.core.runQuickQuery(myQuery, listName, allowUpdate);
+		Core.core.runQuickQuery(myQuery, primaryKey, allowUpdate);
 		resultBar.setSelectedIndex(temp);
 	}
 

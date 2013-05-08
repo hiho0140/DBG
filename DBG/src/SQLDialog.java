@@ -82,9 +82,9 @@ public abstract class SQLDialog extends JPanel{
 	}
 	
 	public void close(){
-		Core.core.runDialogQuery(getQuery());
+		Core.core.runDialogQuery(getQuery(), curTable);
 		if(getQuery().getType() != Query.SELECT){
-			Core.core.runDialogQuery("SELECT * from " + curTable + ";");
+			Core.core.runDialogQuery("SELECT * from " + curTable + ";", curTable);
 		}
 	}
 	

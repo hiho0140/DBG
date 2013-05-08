@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 // rules get added to the source code for each datatype.
 
 
-public class QueryPanel extends JPanel{
+public class BuilderPanel extends JPanel{
 	
 	private ArrayList<JTextField> fields;
 	private ArrayList<JComboBox> operators;
@@ -33,7 +33,7 @@ public class QueryPanel extends JPanel{
 	String[] stringOps = { "=", "!=", "LIKE", "NOT LIKE", "IN" };
 
 	//Query Mode Constructor
-	public QueryPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn, boolean noOperators) {
+	public BuilderPanel(ArrayList<String> nl, ArrayList<Integer> tl, String tn, boolean noOperators) {
 		fields = new ArrayList<JTextField>();
 		operators = new ArrayList<JComboBox>();
 		attributes = new ArrayList<String>(nl);

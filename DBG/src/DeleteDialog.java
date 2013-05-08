@@ -12,7 +12,7 @@ import javax.swing.JScrollPane;
 
 public class DeleteDialog extends SQLDialog{
 
-	private QueryPanel main;
+	private BuilderPanel main;
 	private JScrollPane mainScroll;
 	
 	public DeleteDialog(SQLFrame p) {
@@ -60,7 +60,7 @@ public class DeleteDialog extends SQLDialog{
 		if(this.isAncestorOf(mainScroll)){
 			this.remove(mainScroll);
 		}
-		main = new QueryPanel(attribNames, attribTypes, curTable, false);
+		main = new BuilderPanel(attribNames, attribTypes, curTable, false);
 		mainScroll = new JScrollPane(main);
 		this.add(mainScroll, BorderLayout.CENTER);
 		this.finalize();

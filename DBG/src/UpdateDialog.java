@@ -12,7 +12,7 @@ import javax.swing.JScrollPane;
 
 public class UpdateDialog extends SQLDialog{
 	
-	private QueryPanel conditions, values;
+	private BuilderPanel conditions, values;
 	private JScrollPane condScroll, valScroll;
 	private JPanel main, topPanel, leftPanel, rightPanel;
 	
@@ -90,8 +90,8 @@ public class UpdateDialog extends SQLDialog{
 			rightPanel.remove(valScroll);
 		}
 		
-		values = new QueryPanel(attribNames, attribTypes, curTable, true);
-		conditions = new QueryPanel(attribNames, attribTypes, curTable, false);
+		values = new BuilderPanel(attribNames, attribTypes, curTable, true);
+		conditions = new BuilderPanel(attribNames, attribTypes, curTable, false);
 		
 		valScroll = new JScrollPane(values);
 		condScroll = new JScrollPane(conditions);

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -39,6 +40,7 @@ public class Core {
 	private JScrollPane scroller;
 	private DefaultTableModel model;
 	private QuickPanel quickPanel;
+	private ViewPanel viewPanel;
 	private Sidebar quickBar;
 	private JPanel centerPanel;
 	private CardLayout cl;
@@ -47,7 +49,7 @@ public class Core {
 	private JButton rawButton;
 	public JFrame window;
 	
-	public static final String TABLE = "table", QUICKPANEL = "quickpanel";
+	public static final String TABLE = "table", QUICKPANEL = "quickpanel", VIEWPANEL = "viewpanel";
 	
 	private ArrayList<SQLDialog> dialogs = new ArrayList<SQLDialog>();
 	
@@ -69,11 +71,11 @@ public class Core {
 				core.initGUI();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 				JOptionPane.showMessageDialog(null, e.getMessage());
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 
@@ -121,13 +123,16 @@ public class Core {
 			}
 		};
 		table = new JTable(model);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		scroller = new JScrollPane(table);
 		quickPanel = new QuickPanel();
+		viewPanel = new ViewPanel();
 		
 		cl = new CardLayout();
 		centerPanel = new JPanel(cl);
 		centerPanel.add(scroller, Core.TABLE);
 		centerPanel.add(quickPanel, Core.QUICKPANEL);
+		centerPanel.add(viewPanel, Core.VIEWPANEL);
 
 		//========================//
 		//====== SIDE PANEL ======//
@@ -221,7 +226,8 @@ public class Core {
 		window.add(bottomPanel, BorderLayout.SOUTH);
 		window.add(quickBar, BorderLayout.WEST);
 		window.setJMenuBar(menuBar);
-		window.setSize(600, 500);
+		window.setSize(1000, 600);
+		window.setResizable(false);
 		window.setVisible(true);
 				
 	}
@@ -334,7 +340,7 @@ public class Core {
 			updateDataTypes();
 		} catch (SQLException e) {
 			if(!(!q.startsWith("SELECT") && e.getMessage().equals("No results were returned by the query."))){
-				e.printStackTrace();
+				//e.printStackTrace();
 				JOptionPane.showMessageDialog(null, e.getMessage());
 			}
 		}
@@ -350,20 +356,20 @@ public class Core {
 			updateAttributeNames();
 			updateDataTypes();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return curResults;
 	}
 	
-	public synchronized void runDialogQuery(Query q){
+	public synchronized void runDialogQuery(Query q, String tn){
 		runQuery(q.toString());
-		populateTable(curResults);
+		populateTable(curResults, tn);
 		switchToTable();
 	}
 	
-	public void runDialogQuery(String string) {
+	public void runDialogQuery(String string, String tn) {
 		runQuery(string);
-		populateTable(curResults);
+		populateTable(curResults, tn);
 		switchToTable();
 	}
 	
@@ -373,8 +379,51 @@ public class Core {
 		switchToQuickPanel();
 	}
 	
+	public synchronized void runQuickQuery(String q, String[] n, boolean b){
+		runQuery(q);
+		generateQuickPanel(0, n, b, q);
+		switchToQuickPanel();
+	}
+	
+	public void runQuickView(String v, String n){
+		runQuery("SELECT * FROM " + v + ";");
+		generateViewPanel(v, n);
+		switchToViewPanel();
+	}
+	
+	public void runQuickView(String v, String[] n){
+		runQuery("SELECT * FROM " + v + ";");
+		generateViewPanel(v, n);
+		switchToViewPanel();
+	}
+	
 	public synchronized void runRawQuery(){
-		runDialogQuery(rawField.getText());
+		runQuery(rawField.getText());
+		populateTable(curResults);
+		switchToTable();
+	}
+	
+	public void populateTable(ResultSet rs, String tn){
+		Vector<Vector<String>> data = new Vector<Vector<String>>();
+		Vector<String> next;
+		attribNames.clear();
+		
+		try {
+			while(rs.next()){
+				next = new Vector<String>();
+				for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
+					next.add(rs.getString(i));
+				}
+				data.add(next);
+			}
+			for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
+				attribNames.add(rs.getMetaData().getColumnName(i));
+			}
+			populateTable(getNiceNames(tn, attribNames), data);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
 	}
 	
 	public void populateTable(ResultSet rs){
@@ -396,7 +445,7 @@ public class Core {
 			populateTable(new Vector<String>(attribNames), data);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
@@ -405,7 +454,39 @@ public class Core {
 		table.repaint();
 	}
 	
-	public void generateQuickPanel(int index){
+	public void generateQuickPanel(int index, String n, boolean b, String q){
+		try {
+			if(curResults.getMetaData().getColumnCount() > 0){
+				quickPanel.setTableName((((PGResultSetMetaData)curResults.getMetaData()).getBaseTableName(1)));
+				populateQuickPanel(getAttributeNames(), getDataTypes(), getRowArrayList(index));
+				quickPanel.setListName(n);
+				quickPanel.updateList(getResultList(n));
+				quickPanel.setQuery(q);
+				quickPanel.setCanApply(b);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+	}
+	
+	public void generateQuickPanel(int index, String[] n, boolean b, String q){
+		try {
+			if(curResults.getMetaData().getColumnCount() > 0){
+				quickPanel.setTableName((((PGResultSetMetaData)curResults.getMetaData()).getBaseTableName(1)));
+				populateQuickPanel(getAttributeNames(), getDataTypes(), getRowArrayList(index));
+				quickPanel.setListName(n);
+				quickPanel.updateList(getResultList(n));
+				quickPanel.setQuery(q);
+				quickPanel.setCanApply(b);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+	}
+	
+	public void populateQuickPanel(int index){
 		if(index >= 0){
 			ArrayList<String> data = new ArrayList<String>();
 			
@@ -416,32 +497,48 @@ public class Core {
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			
 			quickPanel.populateFields(data);
 		}
 	}
-	
-	public void generateQuickPanel(int index, String n, boolean b, String q){
-		try {
-			if(curResults.getMetaData().getColumnCount() > 0){
-				quickPanel.setTable((((PGResultSetMetaData)curResults.getMetaData()).getBaseTableName(1)));
-				populateQuickPanel(getAttributeNames(), getDataTypes(), getRowArrayList(index));
-				quickPanel.updateList(getResultList(n));
-				quickPanel.setQuery(q);
-				quickPanel.setListName(n);
-				quickPanel.setCanApply(b);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
+		
 	public void populateQuickPanel(ArrayList<String> colNames, ArrayList<Integer> types, ArrayList<String> data){
 		quickPanel.generateFields(colNames, types);
 		quickPanel.populateFields(data);
+	}
+	
+	public void generateViewPanel(String viewName, String groupBy){
+		viewPanel.generateList(viewName, groupBy);
+	}
+	
+	public void generateViewPanel(String viewName, String[] groupBy){
+		viewPanel.generateList(viewName, groupBy);
+	}
+	
+	public void populateViewPanel(int index){
+		if(index >= 0){
+			Vector<Vector<String>> data = new Vector<Vector<String>>();
+			Vector<String> next;
+			String groupVal = viewPanel.getGroupValue(index), groupName = viewPanel.getGroupName();
+			try {
+				curResults.first();
+				do{
+					next = new Vector<String>();
+					if(curResults.getString(groupName).equals(groupVal)){
+						for(int i = 1; i <= curResults.getMetaData().getColumnCount(); i++){
+							next.add(curResults.getString(i));
+						}
+						data.add(next);
+					}
+				}while(curResults.next());
+				viewPanel.populateTable(data);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
+		}
 	}
 	
 	public void switchView(){
@@ -456,8 +553,22 @@ public class Core {
 		cl.show(centerPanel, Core.QUICKPANEL);
 	}
 	
+	public void switchToViewPanel(){
+		cl.show(centerPanel, Core.VIEWPANEL);
+	}
+	
 	public String getNiceName(String tableName, String attributeName){
 		return nameMan.getNameFor(tableName, attributeName);
+	}
+	
+	public Vector<String> getNiceNames(String tableName, ArrayList<String> attributeNames){
+		Vector<String> result = new Vector<String>();
+		for(String s : attributeNames){
+			if(nameMan.getNameFor(tableName, s).length() > 0){
+				result.add(nameMan.getNameFor(tableName, s));
+			}
+		}
+		return result;
 	}
 	
 	public ArrayList<String> getRowArrayList(int index){
@@ -469,7 +580,7 @@ public class Core {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return results;
 	}
@@ -483,7 +594,7 @@ public class Core {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return results;
 	}
@@ -498,7 +609,49 @@ public class Core {
 			}while(curResults.next());
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	public ArrayList<String> getViewList(String n){
+		ArrayList<String> result = new ArrayList<String>();
+		
+		try {
+			curResults.first();
+			do{
+				if(!result.contains(curResults.getString(n))){
+					result.add(curResults.getString(n));
+				}
+			}while(curResults.next());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	public ArrayList<String> getResultList(String[] n){
+		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> names = new ArrayList<String>(Arrays.asList(n));
+		
+		try {
+			curResults.first();
+			do{
+				String temp = new String();
+				for(int i = 0; i < names.size(); i++ ){
+					temp = temp + curResults.getString(names.get(i));
+					if(i < names.size() - 1){
+						temp = temp + ", ";
+					}
+				}
+				result.add(temp);
+			}while(curResults.next());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
 		}
 		
 		return result;

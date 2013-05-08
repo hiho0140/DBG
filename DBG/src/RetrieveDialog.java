@@ -8,7 +8,7 @@ import javax.swing.JScrollPane;
 
 public class RetrieveDialog extends SQLDialog{
 	
-	private QueryPanel main;
+	private BuilderPanel main;
 	private JScrollPane mainScroll;
 	
 	public RetrieveDialog(SQLFrame p) {
@@ -52,7 +52,7 @@ public class RetrieveDialog extends SQLDialog{
 		if(this.isAncestorOf(mainScroll)){
 			this.remove(mainScroll);
 		}
-		main = new QueryPanel(attribNames, attribTypes, curTable, false);
+		main = new BuilderPanel(attribNames, attribTypes, curTable, false);
 		mainScroll = new JScrollPane(main);
 		this.add(mainScroll, BorderLayout.CENTER);
 		this.finalize();
