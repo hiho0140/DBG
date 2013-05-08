@@ -117,7 +117,7 @@ public class Core {
 		//=========================//
 		
 		//Put the table in a scrollpane so the column headers show up properly
-		model = new DefaultTableModel(testdata, attribNames.toArray()){
+		model = new DefaultTableModel(null, attribNames.toArray()){
 			public boolean isCellEditable(int row, int col){
 				return false;
 			}
