@@ -1,19 +1,26 @@
+/*
+ * QuickPanel.java
+ * 
+ * Used by Core as the interface for quick functions called on
+ * tables. Provides labeled text fields for each attribute in the
+ * table the function was called on, as well as buttons to
+ * apply/revert changes or delete/add entries based on the values
+ * currently within the given text fields.
+ * 
+ * In short, allows for a more digested manner of looking at and 
+ * editing individual entries in a specific table.
+ * 
+ */
+
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 

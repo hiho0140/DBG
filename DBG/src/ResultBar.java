@@ -1,3 +1,10 @@
+/*
+ * ResultBar.jave
+ * 
+ * Used by QuickPanel and ViewPanel as a way to represent entries
+ * returned from a particular query for selection by the user.
+ */
+
 import java.awt.BorderLayout;
 import java.util.Vector;
 import javax.swing.*;

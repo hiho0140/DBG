@@ -1,3 +1,10 @@
+/*
+ * RetrieveDialog.java
+ * 
+ * A subclass of SQLDialog designed to facilitate the creation of SELECT queries.
+ * 
+ */
+
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 

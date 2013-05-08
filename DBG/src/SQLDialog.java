@@ -1,3 +1,13 @@
+/*
+ * SQLDialog.java
+ * 
+ * This class is designed to facilitate easy formulation of CRUD queries
+ * by providing a simple, extensible interface for the user to enter
+ * desired conditions and update values into. Four subclasses exist,
+ * each one for a specific CRUD function. -None- of them allow for
+ * table modification, only operations on entries within tables.
+ */
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;

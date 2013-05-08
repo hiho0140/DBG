@@ -1,3 +1,13 @@
+/*
+ * Sidebar.java
+ * 
+ * Displays a set of quick function buttons, each of which calls
+ * a specific, predefined query - each of these causes either a
+ * QuickPanel or a ViewPanel to be displayed within the main GUI
+ * frame, depending on whether the query was called on a table or
+ * a view.
+ */
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;

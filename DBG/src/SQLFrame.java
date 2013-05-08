@@ -1,3 +1,13 @@
+/*
+ * SQLFrame.java
+ * 
+ * A simple extension of JFrame that displays a single SQLDialog
+ * based on the last CRUD function button the user clicked.
+ * 
+ * Implemented to solve issues with multiple SQLDialogs being spawned
+ * when a CRUD function builder button was clicked.
+ */
+
 import java.awt.Dimension;
 
 import javax.swing.JFrame;

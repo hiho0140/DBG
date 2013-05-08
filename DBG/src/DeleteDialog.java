@@ -1,3 +1,10 @@
+/*
+ * DeleteDialog.java
+ * 
+ * A subclass of SQLDialog designed to facilitate the creation of DELETE queries.
+ * 
+ * Does -not- create DROP queries.
+ */
 import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 
 public class DeleteDialog extends SQLDialog{
 

@@ -1,3 +1,11 @@
+/*
+ * UpdateDialog.java
+ * 
+ * A subclass of SQLDialog designed to facilitate the creation of UPDATE queries.
+ * 
+ * Allows only for updates to entries within tables, not to the tables themselves.
+ */
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.sql.ResultSet;

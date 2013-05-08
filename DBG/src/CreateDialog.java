@@ -1,3 +1,11 @@
+/*
+ * CreateDialog.java
+ * 
+ * A subclass of SQLDialog designed to facilitate the creation of INSERT queries.
+ * 
+ * Ironically, it does -not- create CREATE queries.
+ */
+
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 

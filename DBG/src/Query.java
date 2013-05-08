@@ -1,3 +1,27 @@
+/*
+ * Query.java
+ * 
+ * Query is designed to build a query string that can be fed directly to
+ * an SQL database. It accepts conditions, and values in various forms, 
+ * formatting them when forming the resulting query string.
+ * 
+ * Assume the table <table> has only one attribute, "id", which is an integer.
+ * <type> refers to an integer constant in java.sql.Types that represents the
+ * datatype of a particular integer.
+ * 
+ * Conditions must be met for a query to act on an entry.
+ * EX: 	addCondition(<type>, "id", "=", "40");
+ * 		"SELECT * FROM <table> where id = 40"
+ * 
+ * Updates are values to update matching attributes to.
+ * EX: 	addValue(<type>, "50");
+ * 		"... SET(id = 50) where..."
+ * 
+ * Values are values to be added to a table when creating a new entry.
+ * EX: 	addValue(<type>, "60");
+ * 		"INSERT into <table> VALUES(60);"
+ */
+
 import java.sql.Types;
 import java.util.ArrayList;
 
@@ -21,7 +45,9 @@ public class Query {
 	
 	//Add a condition that this query must meet
 	//name = attribute name, cond = conditional phrase
-	//Ex: addCondition("firstName", "=", "derp");
+	//op = text string representing an operator
+	//type = constant in java.sql.Types
+	//Ex: addCondition(<int>, "firstName", "=", "derp");
 	public void addCondition(int type, String name, String op, String val){
 		switch(type){
 			case Types.BIT:
@@ -45,8 +71,8 @@ public class Query {
 	}
 	
 	//Add a value to update a matching attribute to
-	//name = attribute name, op = operator, cond = conditional phrase
-	//Ex: addUpdate("firstName", "=", "'derp'");
+	//name = attribute name, cond = conditional phrase
+	//Ex: addUpdate("firstName", "'derp'");
 	public void addUpdate(int type, String name, String val){
 		switch(type){
 		case Types.BIT:

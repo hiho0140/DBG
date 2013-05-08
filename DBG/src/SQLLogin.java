@@ -1,3 +1,10 @@
+/*
+ * SQLLogin.java
+ * 
+ * SQLLogin is used by Core at startup to request login information
+ * from the user for authentication with the SQL database.
+ */
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 

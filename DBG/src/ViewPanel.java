@@ -1,3 +1,16 @@
+/*
+ * ViewPanel.java
+ * 
+ * Used by Core as the interface for quick functions called on
+ * views. Views may not be edited, and typically have composite
+ * primary keys, so a table view is used instead of text fields.
+ * The ResultBar instance is populated with all unique values for
+ * a specified key, such as (first_name, last_name). Selecting
+ * a single item within the ResultBar's list would cause the
+ * ViewPanel's table to display all entries in the given view
+ * that matched those conditions.
+ */
+
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Vector;

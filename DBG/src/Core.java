@@ -1,3 +1,13 @@
+/*
+ * Core.java
+ * 
+ * Core provides the bulk of the JDBCGUI's GUI functionality, as well
+ * as the entirety of its interactions with the SQL database. All queries
+ * are run via calls to methods within Core, and Core keeps track of the
+ * ResultSet returned by that query.
+ * 
+ */
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.GridLayout;
@@ -30,7 +40,6 @@ public class Core {
 	
 	public ArrayList<String> tables, attribNames;
 	public ArrayList<Integer> attribTypes;
-	private Object[][] testdata = {{"herp","herp","herp","herp","herp"},{"derp","derp","derp","derp","derp"},{"wat","wat","wat","wat","wat"}};
 	
 	private NameManager nameMan = new NameManager();
 	
@@ -90,7 +99,7 @@ public class Core {
 	
 	private void initGUI(){
 		
-		window = new JFrame("herp derp test");
+		window = new JFrame("JDBC GUI");
 		window.setLayout(new BorderLayout());
 		
 		//========================//

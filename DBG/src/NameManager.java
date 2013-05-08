@@ -1,3 +1,12 @@
+/*
+ * NameManager.java
+ * 
+ * NameManager is the current datastore for "nice names" of attributes.
+ * This could potentially be offloaded to a table within the database
+ * being used or a file on the local filesystem, which could be loaded
+ * at runtime. For now, this will do.
+ */
+
 import java.util.HashMap;
 
 public class NameManager {
