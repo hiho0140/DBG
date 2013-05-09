@@ -1,3 +1,13 @@
+/*
+ * SQLTableModel.java
+ * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
+ */
+
 import java.sql.SQLException;
 import java.util.Vector;
 

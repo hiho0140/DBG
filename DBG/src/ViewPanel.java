@@ -1,6 +1,11 @@
 /*
  * ViewPanel.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * Used by Core as the interface for quick functions called on
  * views. Views may not be edited, and typically have composite
  * primary keys, so a table view is used instead of text fields.

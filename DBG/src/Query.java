@@ -1,6 +1,11 @@
 /*
  * Query.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * Query is designed to build a query string that can be fed directly to
  * an SQL database. It accepts conditions, and values in various forms, 
  * formatting them when forming the resulting query string.

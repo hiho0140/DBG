@@ -1,6 +1,11 @@
 /*
  * Sidebar.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * Displays a set of quick function buttons, each of which calls
  * a specific, predefined query - each of these causes either a
  * QuickPanel or a ViewPanel to be displayed within the main GUI

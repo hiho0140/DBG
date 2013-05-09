@@ -1,6 +1,11 @@
 /*
  * UpdateDialog.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * A subclass of SQLDialog designed to facilitate the creation of UPDATE queries.
  * 
  * Allows only for updates to entries within tables, not to the tables themselves.

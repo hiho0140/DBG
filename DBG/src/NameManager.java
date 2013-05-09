@@ -1,6 +1,11 @@
 /*
  * NameManager.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * NameManager is the current datastore for "nice names" of attributes.
  * This could potentially be offloaded to a table within the database
  * being used or a file on the local filesystem, which could be loaded

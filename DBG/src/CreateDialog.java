@@ -1,6 +1,11 @@
 /*
  * CreateDialog.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * A subclass of SQLDialog designed to facilitate the creation of INSERT queries.
  * 
  * Ironically, it does -not- create CREATE queries.

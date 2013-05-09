@@ -1,3 +1,13 @@
+/*
+ * ResultBarSelectionListener.java
+ * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
+ */
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 

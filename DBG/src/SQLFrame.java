@@ -1,6 +1,11 @@
 /*
  * SQLFrame.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * A simple extension of JFrame that displays a single SQLDialog
  * based on the last CRUD function button the user clicked.
  * 

@@ -1,6 +1,11 @@
 /*
  * QuickPanel.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * Used by Core as the interface for quick functions called on
  * tables. Provides labeled text fields for each attribute in the
  * table the function was called on, as well as buttons to

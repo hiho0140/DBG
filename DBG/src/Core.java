@@ -1,6 +1,12 @@
 /*
  * Core.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
+ * 
  * Core provides the bulk of the JDBCGUI's GUI functionality, as well
  * as the entirety of its interactions with the SQL database. All queries
  * are run via calls to methods within Core, and Core keeps track of the

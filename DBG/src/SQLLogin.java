@@ -1,6 +1,11 @@
 /*
  * SQLLogin.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * SQLLogin is used by Core at startup to request login information
  * from the user for authentication with the SQL database.
  */

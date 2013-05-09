@@ -1,6 +1,11 @@
 /*
  * RetrieveDialog.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * A subclass of SQLDialog designed to facilitate the creation of SELECT queries.
  * 
  */

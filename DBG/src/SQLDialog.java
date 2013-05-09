@@ -1,6 +1,11 @@
 /*
  * SQLDialog.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * This class is designed to facilitate easy formulation of CRUD queries
  * by providing a simple, extensible interface for the user to enter
  * desired conditions and update values into. Four subclasses exist,

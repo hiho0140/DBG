@@ -1,6 +1,11 @@
 /*
  * DeleteDialog.java
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * A subclass of SQLDialog designed to facilitate the creation of DELETE queries.
  * 
  * Does -not- create DROP queries.

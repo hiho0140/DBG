@@ -1,6 +1,11 @@
 /*
  * ResultBar.jave
  * 
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ * 
  * Used by QuickPanel and ViewPanel as a way to represent entries
  * returned from a particular query for selection by the user.
  */

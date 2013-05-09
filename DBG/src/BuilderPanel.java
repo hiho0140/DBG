@@ -13,6 +13,11 @@ import javax.swing.JTextField;
 /*
  * BuilderPanel.java
  *
+ * Team Members:
+ * Steven Zuchowski
+ * Kevin Mahoney
+ * Ian Smudde
+ *
  * This module takes a pair of ArrayLists that contain the names
  * of attributes in a table and their datatypes. It uses that information
  * to create a panel full of labels and formatted text fields.
